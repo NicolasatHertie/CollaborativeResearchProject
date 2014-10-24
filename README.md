@@ -56,6 +56,10 @@ The focus of the research proposal should be
 
 + given our data and research question, what types of descriptive and inferential statistics are appropriate and feasible for us to answer our question (be as specific as possible including possibly looking up R functions and packages that implement these statistics).
 
+### Word count:
+2171
+
+
 ### Deadline for submission:
 Midnight, 24th October
 
