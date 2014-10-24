@@ -21,7 +21,7 @@ Please report any bugs or suggestions at: https://github.com/NicolasatHertie/Col
 ### Instructions and background information on our repository:
 
 In addition to the Readme file, our repository "CollaborativeResearchProject" contains two BibTeX files, an RMD file, a PDF file and an HTML file. The PDF and the HTML were created using the knit function of R Studio. 
-The referenced literature can be found in the BibTeX file "Literature.bib". The R Packages used for the are cited in the BibTeX file "RPackages.bib". As the BibTeX files and the RMD file are dynamically linked, it is important to save all three files in the same folder when trying to run the RMD file.
+The referenced literature can be found in the BibTeX file "Literature.bib". The R Packages used for the proposal are cited in the BibTeX file "RPackages.bib". As the BibTeX files and the RMD file are dynamically linked, it is important to save all three files in the same folder when trying to run the RMD file.
 
 The focus of our research is the identification of the determinants of HIV/AIDS and we propose 3 models to test what factors influence HIV/AIDS incidence and prevalence at the macro and micro level. All the literature utilized for this research can be publicly accessed. Furthermore, clarification of key concepts is provided via hyperlinks. 
 
@@ -29,16 +29,17 @@ We have mostly used data from the World Bank, Demographic and Health Surveys (DH
 
 All files follow the same structure:
 
-1. Introduction
-2. Aim, Research Question and Hypotheses
-3. Literature Review
-4. Data Sources
-5. Methodology and Data Analysis
-6. Limitations
-7. Bibliography
-8. Appendix
+1. Preparation
+2. Introduction
+3. Aim, Research Question and Hypotheses
+4. Literature Review
+5. Data Sources
+6. Methodology and Data Analysis
+7. Limitations
+8. Bibliography
+9. Appendix
 
-# Further Informations on the Tasks
+# Task for the assignment
 
 The task for this assignment was to write a research proposal that:
 
