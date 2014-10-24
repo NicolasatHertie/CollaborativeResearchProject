@@ -20,7 +20,8 @@ Please report any bugs or suggestions at: https://github.com/NicolasatHertie/Col
 
 ### Instructions and background information on our repository:
 
-In addition to the Readme file, our repository "CollaborativeResearchProject" contains a BibTex bibliography, an RMD file, a PDF file and an HTML file. The PDF and the HTML were created using the knit function of R Studio. It is important to save the BibTex bibliography and the RMD file in the same folder when trying to run the RMD file.
+In addition to the Readme file, our repository "CollaborativeResearchProject" contains two BibTeX bibliographies, an RMD file, a PDF file and an HTML file. The PDF and the HTML were created using the knit function of R Studio. 
+The referenced literature can be found in the BibTeX file "Literature.bib". The R Packages used for the are cited in the BibTeX file "RPackages.bib". As the BibTeX files and the RMD file are dynamically linked, it is important to save all three files in the same folder when trying to run the RMD file.
 
 The focus of our research is the identification of the determinants of HIV/AIDS and we propose 3 models to test what factors influence HIV/AIDS incidence and prevalence at the macro and micro level. All the literature utilized for this research can be publicly accessed. Furthermore, clarification of key concepts is provided via hyperlinks. 
 
@@ -36,7 +37,6 @@ All files follow the same structure:
 6. Limitations
 7. Bibliography
 8. Appendix
-
 
 # Further Informations on the Tasks
 
