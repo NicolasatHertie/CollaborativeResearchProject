@@ -22,7 +22,7 @@ Please report any bugs or suggestions at: https://github.com/NicolasatHertie/Col
 
 In addition to the Readme file, our repository "CollaborativeResearchProject" contains one R code, a PDF file and an HTML file. The PDF and the HTML were created using the knit function of R Studio. 
 
-The focus of our research are the determinants of HIV/AIDS and we have build 3 models to test what factors influence HIV/AIDS incidence and prevalence at the macro and micro level. All the literature utilized for this research can be publicly accessed and we have included hyperlinks to the sources. 
+The focus of our research are the determinants of HIV/AIDS and we have built 3 models to test what factors influence HIV/AIDS incidence and prevalence at the macro and micro level. All the literature utilized for this research can be publicly accessed and we have included hyperlinks to the sources. 
 
 We have mostly used data from the World Bank, Demographic and Health Surveys (DHS) and AIDS Indicator Surveys (AIS). It should be noted that an authorization is required to access the last two sources. However, our research provides a detailed explanation of the information used and descriptive statistics of these sources. 
 
