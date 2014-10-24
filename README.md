@@ -20,9 +20,9 @@ Please report any bugs or suggestions at: https://github.com/NicolasatHertie/Col
 
 ### Instructions and background information on our repository:
 
-In addition to the Readme file, our repository "CollaborativeResearchProject" contains one R code, a PDF file and an HTML file. The PDF and the HTML were created using the knit function of R Studio. 
+In addition to the Readme file, our repository "CollaborativeResearchProject" contains a BibTex bibliography, an RMD file, a PDF file and an HTML file. The PDF and the HTML were created using the knit function of R Studio. It is important to save the BibTex bibliography and the RMD file in the same folder when trying to run the RMD file.
 
-The focus of our research are the determinants of HIV/AIDS and we have built 3 models to test what factors influence HIV/AIDS incidence and prevalence at the macro and micro level. All the literature utilized for this research can be publicly accessed and we have included hyperlinks to the sources. 
+The focus of our research is identification of the determinants of HIV/AIDS and we propose 3 models to test what factors influence HIV/AIDS incidence and prevalence at the macro and micro level. All the literature utilized for this research can be publicly accessed. Furthermore, clarification of key concepts is provided via hyperlinks. 
 
 We have mostly used data from the World Bank, Demographic and Health Surveys (DHS) and AIDS Indicator Surveys (AIS). It should be noted that an authorization is required to access the last two sources. However, our research provides a detailed explanation of the information used and descriptive statistics of these sources. 
 
@@ -32,7 +32,7 @@ All files follow the same structure:
 2. Aim, Research Question and Hypotheses
 3. Literature Review
 4. Data Sources
-5. Methodology & Data Analysis
+5. Methodology and Data Analysis
 6. Limitations
 7. Bibliography
 8. Appendix
