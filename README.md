@@ -16,50 +16,47 @@ R Core Team (2014). R: A language and environment for
   
 > Style guide: We use Hadley Wickham´s Style Guide from [r-pkgs.had.co.nz/style.html](http://r-pkgs.had.co.nz/style.html).
 
-Please report any bugs or suggestions at: https://github.com/NicolasatHertie/FirstAssignment/issues/6
+Please report any bugs or suggestions at: https://github.com/NicolasatHertie/CollaborativeResearchProject/issues/2
 
 ### Instructions and background information on our repository:
-Our repository "CollaborativeResearchProject" contains one R code, a PDF file and an HTML file. The PDF and the HTML were created using the knit function of R Studio. 
 
-All the literature utilized for the research can be publicly accessed and the documents contain hyperlinks to the sources. 
+In addition to the Readme file, our repository "CollaborativeResearchProject" contains one R code, a PDF file and an HTML file. The PDF and the HTML were created using the knit function of R Studio. 
 
-The code 'CodeNico' works with the data set called women which describes the average heights and weights for American women aged 30 to 39. The code 'CodeMeilin' works with the data set infert which describes infertility after spontaneous and induced abortions.
+The focus of our research are the determinants of HIV/AIDS and we have build 3 models to test what factors influence HIV/AIDS incidence and prevalence at the macro and micro level. All the literature utilized for this research can be publicly accessed and we have included hyperlinks to the sources. 
 
-Both codes are structured according to the following logic:
+We have mostly used data from the World Bank, Demographic and Health Surveys (DHS) and AIDS Indicator Surveys (AIS). It should be noted that an authorization is required to access the last two sources. However, our research provides a detailed explanation of the information used and descriptive statistics of these sources. 
 
-1. Setting the working directory and load packages
-2. Dynamically linking the files (only for 'CodeNico')
-3. Choosing the data set
-4. Exploring the data set
-5. Providing descripitive statistics
+All files follow the same structure:
 
-### Pull Requests
-
-We did some minor changes to the File Henryjean/Pair-Assignment-1 of Owen and Thierry and created a pull request.
+1. Introduction
+2. Aim, Research Question and Hypotheses
+3. Literature Review
+4. Data Sources
+5. Methodology & Data Analysis
+6. Limitations
+7. Bibliography
+8. Appendix
 
 
 # Further Informations on the Tasks
 
-Each pair will create a new public GitHub repository. It must be fully documented, 
-including with a descriptive README.md file. Your code must be human readable and 
-clearly commented.
+The task for this assignment was to write the research proposal that:
 
-Each pair should include R source code files that:
-+ Access at least two core R data sets
-+ Illustrate the datas’ distributions using a variety of relevant
-descriptive statistics
-+ Two files must be dynamically linked
++ States the research question and justifies why it is interesting.
++ Includes a basic literature review (properly cited with BibTeX).
++ Identifies data sources and appropriate research methodologies 
+for answering the research question.
 
-Another pair makes a pull request. And this is discussed/merged.
+The focus of the research proposal should be 
 
-### Learning objectives: 
-Develop your understanding of: 
-+ File structures,
-+ Version control,
-+ Basic R data structures and descriptive statistics.
++ clearly identify and cite your intended data sources
+
++ describe what format the data is currently in and how we intend to clean it up so that it is usable for statistical analysis
+
++ given our data and research question, what types of descriptive and inferential statistics are appropriate and feasible for us to answer our question (be as specific as possible including possibly looking up R functions and packages that implement these statistics).
 
 ### Deadline for submission:
-Midnight, 26th September
+Midnight, 24th October
 
 
 
