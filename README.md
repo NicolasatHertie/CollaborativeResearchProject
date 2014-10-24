@@ -40,7 +40,7 @@ All files follow the same structure:
 
 # Further Informations on the Tasks
 
-The task for this assignment was to write the research proposal that:
+The task for this assignment was to write a research proposal that:
 
 + States the research question and justifies why it is interesting.
 + Includes a basic literature review (properly cited with BibTeX).
