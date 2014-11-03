@@ -44,29 +44,6 @@ list(group_wb)
 ascending <- arrange(group_wb, year)
 
 
-ascending <- arrange(wbInfo, wbInfo$year)
-
-year <- grep('[2000-35]', MedalTable$V6)
-ascending <- arrange(total_medals)
-
-min_max_medals <- summarize(Medaltable,min_medals = min(MedalTable$V6),
-                            max_medals = max(MedalTable$V6))
-
-# Sort highest income for each person in ascending ord
-ascending <- arrange(min_max_income, max_income) head(ascending)[1:3, ]
-
-group_data <- group_by(data, people) head(group_data)[1:5, ]
-
-
-keep Region$country if Region$country==
-  
-grep(pattern = '[1-100]', Region$iso2c)  
-
-  
-table Region$country
-
-> s21$feind [s21$v_651 %in% c(-77,0)] <- NA
-
 # GDP <- WDI(indicator = 'NY.GDP.MKTP.KD')
 # GDPpc <- WDI(indicator = 'NY.GDP.PCAP.PP.KD')
 # Poverty <- WDI(indicator = 'SI.POV.GAPS')
