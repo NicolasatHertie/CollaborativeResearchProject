@@ -89,13 +89,17 @@ names(cluster)[29] <- "SmokeFem"
 # SmokeMale <- WDI(indicator = 'SH.PRV.SMOK.MA')
 names(cluster)[30] <- "SmokeMale"
   
-  
-  
-  
+## Try to handle the missing values  
+install.packages("Amelia")  
+library(Amelia)  
+summary(cluster)
+a.out <- amelia(cluster, m = 259, ts = "year", cs = "country")
 
 
+a.out <- amelia(x=cluster,m=2,cs="country",ts="year")
+summary(a.out)
 
-
+str(cluster)
 
 
 
