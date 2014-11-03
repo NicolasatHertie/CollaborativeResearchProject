@@ -18,16 +18,42 @@ wbInfo <- wbInfo[which(rowSums(!is.na(wbInfo[, indicators])) > 0), ]
 # get rid of rows where iso is missing
 wbInfo <- wbInfo[!is.na(wbInfo$iso2c),]
 
+str(wbInfo)
 
 
+mean(wbInfo$SP.RUR.TOTL.ZS)
+as.numeric('wbInfo$SP.RUR.TOTL.ZS')
 
-
+mean(wbInfo$year)
 # replace FullWDIDataBase$GDP <- FullWDIDataBase$NY.GDP.MKTP.KD
 
 Region <- FullWDIDataBase
 
+library(randomNames) 
+library(dplyr) 
+library(tidyr)
+library(httr) 
+library(dplyr) 
+library(XML)
+
+# Group
+group_wb <- group_by(wbInfo, iso2c)
+list(group_wb)
+ascending <- arrange(group_wb, year)
 
 
+ascending <- arrange(wbInfo, wbInfo$year)
+
+year <- grep('[2000-35]', MedalTable$V6)
+ascending <- arrange(total_medals)
+
+min_max_medals <- summarize(Medaltable,min_medals = min(MedalTable$V6),
+                            max_medals = max(MedalTable$V6))
+
+# Sort highest income for each person in ascending ord
+ascending <- arrange(min_max_income, max_income) head(ascending)[1:3, ]
+
+group_data <- group_by(data, people) head(group_data)[1:5, ]
 
 
 keep Region$country if Region$country==
