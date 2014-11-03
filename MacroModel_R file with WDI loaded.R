@@ -1,4 +1,4 @@
-# Required packages #
+### 1. Load Required Packages
 
 library(RJSONIO)
 library(WDI)
@@ -9,28 +9,31 @@ library(httr)
 library(dplyr) 
 library(XML)
 
-## Loading the default data for the years 2000-2012 from the Worldbank database## 
+### 2. Loading the default data for the years 2000-2012 from the Worldbank database 
 wbdata <- c('NY.GDP.MKTP.KD', 'NY.GDP.PCAP.PP.KD', 'SI.POV.GAPS', 'SP.RUR.TOTL.ZS', 'EN.ATM.CO2E.PC', 'EG.ELC.ACCS.ZS', 'SH.XPD.TOTL.ZS', 'SH.H2O.SAFE.ZS', 'SH.STA.ACSN', 'SL.UEM.TOTL.ZS','SL.TLF.0714.WK.ZS', 'SE.PRM.ENRR', 'SL.UEM.TOTL.FE.ZS', 'SE.PRM.ENRR.FE', 'SP.HOU.FEMA.ZS', 'SP.DYN.LE00.IN', 'SI.POV.GINI', 'SH.CON.1524.FE.ZS', 'SH.CON.1524.MA.ZS', 'SP.DYN.CONU.ZS', 'SH.IMM.IDPT', 'SH.IMM.MEAS', 'SH.STA.OWGH.ZS', 'SH.PRV.SMOK.FE', 'SH.PRV.SMOK.MA')
 
-### Get rid of Regions and only look at countries
+### 3. Clean the data
+
+#Get rid of Regions and only look at countries
 countries <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE)
 countries <- countries[countries$region != "Aggregates", ]
 
-# Get rid of rows where all indicators have NA
+# Get rid of rows where all variables are missing
 countries <- countries[which(rowSums(!is.na(countries[, indicators])) > 0), ]
 
 # Get rid of rows where information on variable iso2c is missing
 countries <- countries[!is.na(countries$iso2c),]
 
-# Look if variables are already coded as numeric
+# Make sure the variables are already coded as numeric
 str(countries)
 
-# Cluster observations by country
+# Cluster the observations by country
 cluster <- group_by(countries, iso2c)
-# Order the clusters by year (ascending)
+
+# Order the country clusters by year (ascending)
 cluster <- arrange(cluster, year)
 
-### Relabel the variables
+## Relabel the variables
 # GDP <- WDI(indicator = 'NY.GDP.MKTP.KD')
 names(cluster)[4] <- "GDP"
 # GDPpc <- WDI(indicator = 'NY.GDP.PCAP.PP.KD')
