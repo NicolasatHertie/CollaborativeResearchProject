@@ -4,7 +4,7 @@ bibliography:
 - Literature.bib
 - Packages.bib
 date: "24 October 2014"
-output: html_document
+output: pdf_document
 number_sections: yes
 highlight: zenburn
 authors: Meilin Moellenkamp and Nicolas Rosemberg
@@ -16,7 +16,7 @@ toc: yes
 ## 1.   Preparation
 ```{r}
 # Set working directory
-setwd('/Users/Meilin/Desktop/Collaborative Social Data')
+# setwd('/Users/Meilin/Desktop/Collaborative Social Data')
 
 # For this research, the installation of the following packages is required:
 # install.packages('WDI') 
