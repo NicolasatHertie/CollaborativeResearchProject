@@ -2,7 +2,7 @@
 
 library(RJSONIO)
 library(WDI)
-library(randomNames) 
+# library(randomNames) 
 library(dplyr) 
 library(tidyr)
 library(httr) 
