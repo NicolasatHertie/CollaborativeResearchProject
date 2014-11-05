@@ -113,7 +113,10 @@ setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeRe
 library(XLConnect)                
 HIV = loadWorkbook("HIV2013Estimates_1990-2013_22July2014.xlsx") 
 HIVcountry = readWorksheet(HIV, sheet="by region - country")
-HIVcountry <- HIVcountry[-c(1,2,3),]
+
+names(HIVcountry) <- as.vector(HIVcountry[4, ])
+
+HIVcountry <- HIVcountry[-c(1:3),]
 HIVcountry2 <- HIVcountry[,-c(4,5,7,8,10,11,13,14,16,17,19,20,22,23,25,26,28,29,31,32,34:38,40,41)]
 
 install.packages("countrycode")
@@ -125,7 +128,7 @@ HIVcountry2$iso2c <-countrycode(HIVcountry2$HIV.estimates.with.uncertainty.bound
 ## Relabel the variables
 
 names(HIVcountry2)[1] <- "Country"
-names(HIVcountry2)[2] <- "Year"
+names(HIVcountry2)[2] <- "year"
 
 ## Move iso2c to the front ## 
 # help("DataCombine")
@@ -146,11 +149,20 @@ HIVcountry2$unique_id <- paste(HIVcountry2$iso2c, HIVcountry2$Year, sep = "_")
 Merged <- merge(cluster, HIVcountry2,
                 by = c('unique_id'))
 
+#Duplicated -> p. 138
 
 
+Merged2 <- merge(cluster, HIVcountry2,
+                by = c('iso2c', 'year'))
 
+# Solution to the < -> use ranges. Command: cut (option).
 
-
+# Logistic regression: our dependent variables might be categorical (either below or over 0,1). Use predicted probabilites. 
+# Convert variable classes
+# medals$country <- as.character(medals$country)
+# for (i in 2:5) medals[, i] <- as.integer(medals[, i])
+# Check assumptions behind data imputations. Do they apply to our case?
+# Multivariate i.i.d. data. I will not work for binary data. 
 
 
 
