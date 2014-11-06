@@ -30,20 +30,29 @@ HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds,
 # HIVcountry3 <- !apply (is.na(HIVcountry), 1, all)
 
 ## Relabel the variables
+<<<<<<< HEAD
 
 names(HIVcountry)[2] <- "Country"
 names(HIVcountry)[3] <- "Year"
 # Also rename the incidence variable #
+=======
+names(HIVcountry)[1] <- "Country"
+names(HIVcountry)[2] <- "Year"
+#names(HIVcountry)[4] <- "Incidence"
+>>>>>>> FETCH_HEAD
 
 # Recoding "..." as NA 
 HIVcountry$Col9[HIVcountry$Col9 %in% c("...")] <- NA
 
 ## Counting NAs
-
 sum(is.na(HIVcountry$Col9))
 
+# Code dependent variable as dummy
+HIVcountry$dummy <- HIVcountry$Col9
+HIVcountry$dummy[HIVcountry$dummy %in% c(0:0,1)] <- 0
+HIVcountry$dummy[HIVcountry$dummy %in% c(0,1:1)] <- 1
 
-
+table(HIVcountry$dummy)
 
 
 
