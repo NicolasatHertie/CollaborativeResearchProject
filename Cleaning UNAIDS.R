@@ -10,7 +10,7 @@
 
 # setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 getwd()
-# setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
+setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
 #install.packages("XLConnect")
 library(XLConnect)                
@@ -29,6 +29,8 @@ HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds,
 # ?apply
 # HIVcountry3 <- !apply (is.na(HIVcountry), 1, all)
 
+HIVcountrz3 <- subset(HIVcountry, Col9 != NA)
+
 ## Relabel the variables
 <<<<<<< HEAD
 
@@ -45,7 +47,7 @@ names(HIVcountry)[2] <- "Year"
 HIVcountry$Col9[HIVcountry$Col9 %in% c("...")] <- NA
 
 ## Counting NAs
-sum(is.na(HIVcountry$Col9))
+sum(is.na(HIVcountry$Col9)) 
 
 # Code dependent variable as dummy
 HIVcountry$dummy <- HIVcountry$Col9
@@ -54,5 +56,12 @@ HIVcountry$dummy[HIVcountry$dummy %in% c(0,1:1)] <- 1
 
 table(HIVcountry$dummy)
 
+HIVcountry$dummy <- as.numeric(is.na(HIVcountry$Col9))
 
+group_data <- group_by(HIVcountry, iso2c)
+
+data <- mutate(group_data,
+               sumnas = sum(HIVcountry$dummy))
+
+?mutate
 
