@@ -49,6 +49,8 @@ cluster <- arrange(cluster, year)
 install.packages("plyr")
 library(plyr)
 
+
+
 ### Rename Command
 # GDP <- WDI(indicator = 'NY.GDP.MKTP.KD')
 dplyr::rename(cluster, c("NY.GDP.MKTP.KD" = "GDP"))
@@ -127,7 +129,22 @@ amelia(mdi,m=5,p2s=2,idvars=ids,noms=noms,ords=ords,collect=FALSE,
 summarize cluster$GDP
 
 
+# create variable that is one or zero depending whether there is an NA or not NA
+HIVcountry$NAdummy4 <- HIVcountry$Col9
+HIVcountry$NAdummy4[HIVcountry$NAdummy4 >=0] <- 1
+HIVcountry$NAdummy4[is.na(HIVcountry$NAdummy4 == NA)] <- 0
 
+
+group.data <- group_by (HIVcountry, isoby(isoc2)
+
+                    
+# gsub
+
+unique(HIVcountry$Col9)
+
+  
+# use dplyr package - group by- mutate & sum 
+# calculate percentage of missings
 
 
 
