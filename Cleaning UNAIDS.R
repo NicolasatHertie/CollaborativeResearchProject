@@ -8,7 +8,7 @@
 # names(tables)
 
 
-# setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
+#setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 getwd()
 setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
@@ -25,23 +25,19 @@ library("countrycode")
 
 HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds, origin = 'country.name', destination = 'iso2c', warn = FALSE)                               
 
+<<<<<<< Updated upstream
 # HIVcountry2 <- HIVcountry[,colSums(is.na(HIVcountry))<nrow(HIVcountry)]
 # ?apply
 # HIVcountry3 <- !apply (is.na(HIVcountry), 1, all)
 
 HIVcountrz3 <- subset(HIVcountry, Col9 != NA)
 
-## Relabel the variables
-<<<<<<< HEAD
-
-names(HIVcountry)[2] <- "Country"
-names(HIVcountry)[3] <- "Year"
-# Also rename the incidence variable #
 =======
+>>>>>>> Stashed changes
+## Relabel the variables
 names(HIVcountry)[1] <- "Country"
 names(HIVcountry)[2] <- "Year"
 #names(HIVcountry)[4] <- "Incidence"
->>>>>>> FETCH_HEAD
 
 # Recoding "..." as NA 
 HIVcountry$Col9[HIVcountry$Col9 %in% c("...")] <- NA
@@ -49,19 +45,33 @@ HIVcountry$Col9[HIVcountry$Col9 %in% c("...")] <- NA
 ## Counting NAs
 sum(is.na(HIVcountry$Col9)) 
 
+## recode the numbers with ">" & "<"
+grep()
+
+
 # Code dependent variable as dummy
 HIVcountry$dummy <- HIVcountry$Col9
-HIVcountry$dummy[HIVcountry$dummy %in% c(0:0,1)] <- 0
-HIVcountry$dummy[HIVcountry$dummy %in% c(0,1:1)] <- 1
+HIVcountry$dummy[HIVcountry$dummy <= 0.1] <- 0
+HIVcountry$dummy[HIVcountry$dummy > 0.1] <- 1
 
 table(HIVcountry$dummy)
 
+<<<<<<< Updated upstream
 HIVcountry$dummy <- as.numeric(is.na(HIVcountry$Col9))
 
 group_data <- group_by(HIVcountry, iso2c)
 
 data <- mutate(group_data,
                sumnas = sum(HIVcountry$dummy))
+=======
+HIVcountry$dummy3 <- HIVcountry$Col9
+HIVcountry$dummy3[HIVcountry$dummy3 <= 0.2] <- 0
+HIVcountry$dummy3[HIVcountry$dummy3 > 0.2] <- 1
+
+table(HIVcountry$dummy3)
+
+# subset to get rid of NAs
+>>>>>>> Stashed changes
 
 ?mutate
 
