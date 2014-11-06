@@ -26,17 +26,17 @@ library("countrycode")
 HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds, origin = 'country.name', destination = 'iso2c', warn = FALSE)                               
 
 ## Relabel the variables
-
-names(HIVcountry)[1] <- "Country"
-names(HIVcountry)[2] <- "Year"
-# Also rename the incidence variable #
+names(HIVcountry)[2] <- "Country"
+names(HIVcountry)[3] <- "Year"
+names(HIVcountry)[4] <- "Incidence"
 
 # Recoding "..." as NA 
 HIVcountry$Col9[HIVcountry$Col9 %in% c("...")] <- NA
 
 ## Counting NAs
-
 sum(is.na(HIVcountry$Col9))
+
+
 
 
 
