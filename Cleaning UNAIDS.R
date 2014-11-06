@@ -7,24 +7,18 @@
 #   readHTMLTable()
 # names(tables)
 
-<<<<<<< Updated upstream
-setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
-=======
+
+# setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 getwd()
-setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
->>>>>>> Stashed changes
+# setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
 #install.packages("XLConnect")
 library(XLConnect)                
 HIV = loadWorkbook("HIV2013Estimates_1990-2013_22July2014.xlsx") 
 HIVcountry = readWorksheet(HIV, sheet="by region - country")
-<<<<<<< Updated upstream
-HIVcountry <- HIVcountry[-c(1:3),-c(3,4,5,7,8,10:41)]
-=======
->>>>>>> Stashed changes
-
 HIVcountry <- HIVcountry[-c(1:5),-c(3:8,10:41)]
 
+# Creating a unique identifier
 # install.packages("countrycode")
 library("countrycode")
 # countrycode(sourcevar, origin, destination, warn = FALSE) #
@@ -35,22 +29,17 @@ HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds,
 
 names(HIVcountry)[1] <- "Country"
 names(HIVcountry)[2] <- "Year"
+# Also rename the incidence variable #
+
+# Recoding "..." as NA 
+HIVcountry$Col9[HIVcountry$Col9 %in% c("...")] <- NA
 
 ## Counting NAs
 
 sum(is.na(HIVcountry$Col9))
 
-browse(HIVcountry2)
-
-# recoding "..." as NA 
-HIVcountry2$Col15[HIVcountry2$Col15 %in% c("...")] <- NA
-# counting NAs for Adults (all ages) and children newly infected with HIV
-sum(is.na(HIVcountry2$Col15))
-
-HIVcountry2$Col9[HIVcountry2$Col9 %in% c("...")] <- NA
-sum(is.na(HIVcountry2$Col9))
 
 
 
-Col9
+
 
