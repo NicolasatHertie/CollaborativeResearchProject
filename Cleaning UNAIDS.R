@@ -7,14 +7,13 @@
 #   readHTMLTable()
 # names(tables)
 
-setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
+setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 
-# install.packages("XLConnect")
+#install.packages("XLConnect")
 library(XLConnect)                
 HIV = loadWorkbook("HIV2013Estimates_1990-2013_22July2014.xlsx") 
 HIVcountry = readWorksheet(HIV, sheet="by region - country")
-HIVcountry <- HIVcountry[-c(1,2,3),]
-HIVcountry2 <- HIVcountry[,-c(4,5,7,8,10,11,13,14,16,17,19,20,22,23,25,26,28,29,31,32,34:38,40,41)]
+HIVcountry <- HIVcountry[-c(1:3),-c(3,4,5,7,8,10:41)]
 
 install.packages("countrycode")
 library("countrycode")
@@ -26,4 +25,18 @@ HIVcountry2$iso2c <-countrycode(HIVcountry2$HIV.estimates.with.uncertainty.bound
 
 names(HIVcountry2)[1] <- "Country"
 names(HIVcountry2)[2] <- "Year"
+
+browse(HIVcountry2)
+
+# recoding "..." as NA 
+HIVcountry2$Col15[HIVcountry2$Col15 %in% c("...")] <- NA
+# counting NAs for Adults (all ages) and children newly infected with HIV
+sum(is.na(HIVcountry2$Col15))
+
+HIVcountry2$Col9[HIVcountry2$Col9 %in% c("...")] <- NA
+sum(is.na(HIVcountry2$Col9))
+
+
+
+Col9
 
