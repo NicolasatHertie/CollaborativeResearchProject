@@ -7,24 +7,38 @@
 #   readHTMLTable()
 # names(tables)
 
+<<<<<<< Updated upstream
 setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
+=======
+getwd()
+setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
+>>>>>>> Stashed changes
 
 #install.packages("XLConnect")
 library(XLConnect)                
 HIV = loadWorkbook("HIV2013Estimates_1990-2013_22July2014.xlsx") 
 HIVcountry = readWorksheet(HIV, sheet="by region - country")
+<<<<<<< Updated upstream
 HIVcountry <- HIVcountry[-c(1:3),-c(3,4,5,7,8,10:41)]
+=======
+>>>>>>> Stashed changes
 
-install.packages("countrycode")
+HIVcountry <- HIVcountry[-c(1:5),-c(3:8,10:41)]
+
+# install.packages("countrycode")
 library("countrycode")
 # countrycode(sourcevar, origin, destination, warn = FALSE) #
 
-HIVcountry2$iso2c <-countrycode(HIVcountry2$HIV.estimates.with.uncertainty.bounds, origin = 'country.name', destination = 'iso2c', warn = FALSE)                               
+HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds, origin = 'country.name', destination = 'iso2c', warn = FALSE)                               
 
 ## Relabel the variables
 
-names(HIVcountry2)[1] <- "Country"
-names(HIVcountry2)[2] <- "Year"
+names(HIVcountry)[1] <- "Country"
+names(HIVcountry)[2] <- "Year"
+
+## Counting NAs
+
+sum(is.na(HIVcountry$Col9))
 
 browse(HIVcountry2)
 
