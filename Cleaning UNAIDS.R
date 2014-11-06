@@ -25,10 +25,14 @@ library("countrycode")
 
 HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds, origin = 'country.name', destination = 'iso2c', warn = FALSE)                               
 
+# HIVcountry2 <- HIVcountry[,colSums(is.na(HIVcountry))<nrow(HIVcountry)]
+# ?apply
+# HIVcountry3 <- !apply (is.na(HIVcountry), 1, all)
+
 ## Relabel the variables
 
-names(HIVcountry)[1] <- "Country"
-names(HIVcountry)[2] <- "Year"
+names(HIVcountry)[2] <- "Country"
+names(HIVcountry)[3] <- "Year"
 # Also rename the incidence variable #
 
 # Recoding "..." as NA 
