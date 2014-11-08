@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-=======
-
-
-
-
->>>>>>> FETCH_HEAD
 # setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 # setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
@@ -14,32 +7,22 @@
 library(RJSONIO)
 # install.packages("WDI")  
 library(WDI)
-<<<<<<< HEAD
-=======
 # install.packages("randomNames")  
 library(randomNames)
->>>>>>> FETCH_HEAD
 # install.packages("dplyr")  
 library(dplyr) 
 # install.packages("tidyr")  
 library(tidyr)
 # install.packages("httr")  
 library(httr) 
-<<<<<<< HEAD
-=======
 # install.packages("dplyr")  
 library(dplyr)
->>>>>>> FETCH_HEAD
 # install.packages("XML")  
 library(XML)
 #install.packages("plyr")
 library(plyr)
 # install.packages("Amelia")  
 library(Amelia) 
-<<<<<<< HEAD
-=======
-
->>>>>>> FETCH_HEAD
 #install.packages("XLConnect")
 library(XLConnect)    
 # install.packages("countrycode")
@@ -73,11 +56,7 @@ cluster <- group_by(countries, iso2c)
 # Order the country clusters by year (ascending)
 cluster <- arrange(cluster, year)
 
-<<<<<<< HEAD
-## Rename all the variables with simple names
-=======
 ## Rename all the Variables with simple names
->>>>>>> FETCH_HEAD
 # GDP <- WDI(indicator = 'NY.GDP.MKTP.KD')
 cluster <- plyr::rename(cluster, c("NY.GDP.MKTP.KD" = "GDP"))
 # GDPpc <- WDI(indicator = 'NY.GDP.PCAP.PP.KD')
@@ -147,7 +126,6 @@ cluster$latitude <- as.numeric(cluster$latitude)
 cluster$lending <- as.numeric(cluster$lending)
 cluster$income <- as.numeric(cluster$income)
 
-<<<<<<< HEAD
 ### Downloading and preparing UNDAIDS data ###
 
 # The data is publicly available at 'http://www.google.de/url?sa=t&rct=j&q&esrc=s&source=web&cd=1&ved=0CCgQFjAA&url=http%3A%2F%2Fwww.unaids.org%2Fen%2Fmedia%2Funaids%2Fcontentassets%2Fdocuments%2Fdocument%2F2014%2F2014gapreportslides%2FHIV2013Estimates_1990-2013_22July2014.xlsx&ei=0I9XVJyZGoK6af6HAQ&usg=AFQjCNHEjs7Cc82jkTRwrRc8Jq4p2nKqbw&bvm=bv.78677474%2Cd.d2s' #
@@ -172,16 +150,13 @@ HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds,
 HIVcountrz3 <- subset(HIVcountry, Col9 != NA)
 
 ## Relabel the variables
-<<<<<<< HEAD
 
 names(HIVcountry)[2] <- "Country"
 names(HIVcountry)[3] <- "Year"
 # Also rename the incidence variable #
-=======
-  names(HIVcountry)[1] <- "Country"
+names(HIVcountry)[1] <- "Country"
 names(HIVcountry)[2] <- "Year"
 #names(HIVcountry)[4] <- "Incidence"
->>>>>>> FETCH_HEAD
 
 # Recoding "..." as NA 
 HIVcountry$Col9[HIVcountry$Col9 %in% c("...")] <- NA
@@ -202,7 +177,6 @@ HIVcountry$dummy <- as.numeric(is.na(HIVcountry$Col9))
 =======
 
 ## Handle the missing values for the independent variables !!!
->>>>>>> FETCH_HEAD
 
 # 1. For the independent variables, we drop the variable for a country, 
 # if more than 40% of the variable is coded as NA
@@ -279,9 +253,4 @@ HIVcountry$dummy <- HIVcountry$Col9
 HIVcountry$dummy[HIVcountry$dummy <= 0.2] <- 0
 HIVcountry$dummy[HIVcountry$dummy > 0.2] <- 1
 
-<<<<<<< HEAD
 table(HIVcountry$dummy)
-=======
-table(HIVcountry$dummy)
-
->>>>>>> FETCH_HEAD
