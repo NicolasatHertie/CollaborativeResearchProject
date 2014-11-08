@@ -1,3 +1,5 @@
+### Loading and preparing WDI data ###
+
 ### 1. Load Required Packages
 
 library(RJSONIO)
