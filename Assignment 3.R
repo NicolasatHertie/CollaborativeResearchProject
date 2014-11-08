@@ -136,42 +136,30 @@ HIV = loadWorkbook("HIV2013Estimates_1990-2013_22July2014.xlsx")
 HIVcountry = readWorksheet(HIV, sheet="by region - country")
 HIVcountry <- HIVcountry[-c(1:5),-c(3:8,10:41)]
 
-# Creating a unique identifier
-# install.packages("countrycode")
-library("countrycode")
-# countrycode(sourcevar, origin, destination, warn = FALSE) #
+## Rename all the Variables with simple names
+HIVcountry <- plyr::rename(HIVcountry, c("HIV.estimates.with.uncertainty.bounds" = "Country"))
+HIVcountry <- plyr::rename(HIVcountry, c("Col2" = "Year"))
+HIVcountry <- plyr::rename(HIVcountry, c("Col9" = "Incidence"))
 
+# Creating a unique identifier
 HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds, origin = 'country.name', destination = 'iso2c', warn = FALSE)                               
 
-# HIVcountry2 <- HIVcountry[,colSums(is.na(HIVcountry))<nrow(HIVcountry)]
-# ?apply
-# HIVcountry3 <- !apply (is.na(HIVcountry), 1, all)
-
-HIVcountrz3 <- subset(HIVcountry, Col9 != NA)
-
-## Relabel the variables
-
-names(HIVcountry)[2] <- "Country"
-names(HIVcountry)[3] <- "Year"
-# Also rename the incidence variable #
-names(HIVcountry)[1] <- "Country"
-names(HIVcountry)[2] <- "Year"
-#names(HIVcountry)[4] <- "Incidence"
-
 # Recoding "..." as NA 
-HIVcountry$Col9[HIVcountry$Col9 %in% c("...")] <- NA
+HIVcountry$Incidence[HIVcountry$Incidence %in% c("...")] <- NA
+
+# Recoding "<0.01" as 0.009 
+HIVcountry$Incidence[HIVcountry$Incidence %in% c("<0.01")] <- 0.009
 
 ## Counting NAs
-sum(is.na(HIVcountry$Col9)) 
+sum(is.na(HIVcountry$Incidence)) 
+
+# Delete NAs
+HIVcountry2 <- HIVcountry[!is.na(HIVcountry$Incidence),]
+
+# HIVcountry2 <- subset(HIVcountry, Incidence != NA) <- Christopher wrote this
 
 # Code dependent variable as dummy
-HIVcountry$dummy <- HIVcountry$Col9
-HIVcountry$dummy[HIVcountry$dummy %in% c(0:0,1)] <- 0
-HIVcountry$dummy[HIVcountry$dummy %in% c(0,1:1)] <- 1
-
-table(HIVcountry$dummy)
-
-HIVcountry$dummy <- as.numeric(is.na(HIVcountry$Col9))
+HIVcountry$dummy <- as.numeric(!is.na(HIVcountry$Incidence))
 
 ################# Handle the missing values for the independent variables !!!
 =======
@@ -193,6 +181,9 @@ data <- mutate(group_data,
 
 # 1.3 Calculate percentage of missings
 
+install.packages('reshape')
+library(reshape)
+cast(cluster, iso2c ~ year)
 
 # 1.4. For the variables, where less than 40% were missing, we impute predicted values for the NAs
 
