@@ -54,7 +54,7 @@ countries <- countries[!is.na(countries$iso2c),]
 cluster <- group_by(countries, iso2c)
 
 # Order the country clusters by year (ascending)
-cluster <- arrange(cluster, year)
+cluster <- arrange(cluster, iso2c, year)
 
 ## Rename all the Variables with simple names
 # GDP <- WDI(indicator = 'NY.GDP.MKTP.KD')
@@ -111,6 +111,35 @@ cluster <- plyr::rename(cluster, c("SH.STA.OWGH.ZS" = "Overweight"))
 cluster <- plyr::rename(cluster, c("SH.PRV.SMOK.FE" = "SmokeFem"))
 # SmokeMale <- WDI(indicator = 'SH.PRV.SMOK.MA')
 cluster <- plyr::rename(cluster, c("SH.PRV.SMOK.MA" = "SmokeMale"))
+
+## Counting NAs
+sum(is.na(cluster$GDP))
+sum(is.na(cluster$GDPpc))
+sum(is.na(cluster$Poverty))
+sum(is.na(cluster$Rural))
+sum(is.na(cluster$CO2))
+sum(is.na(cluster$Electr))
+sum(is.na(cluster$HCexpend))
+sum(is.na(cluster$HCexpendpc))
+sum(is.na(cluster$Births))
+sum(is.na(cluster$Water))
+sum(is.na(cluster$Sanitation))
+sum(is.na(cluster$Unemploym))
+sum(is.na(cluster$Childemploy))
+sum(is.na(cluster$Primary))
+sum(is.na(cluster$FemUnempl))
+sum(is.na(cluster$FemSchool))
+sum(is.na(cluster$FemHead))
+sum(is.na(cluster$LifeExpect))
+sum(is.na(cluster$Gini))
+sum(is.na(cluster$CondFem))
+sum(is.na(cluster$CondMale))
+sum(is.na(cluster$Contraceptive))
+sum(is.na(cluster$DPT))
+sum(is.na(cluster$Measles))
+sum(is.na(cluster$Overweight))
+sum(is.na(cluster$SmokeFem))
+sum(is.na(cluster$SmokeMale))
 
 
 ## Make sure the variables are already coded as numeric
