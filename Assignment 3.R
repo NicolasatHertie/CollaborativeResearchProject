@@ -35,7 +35,7 @@ wbdata <- c('NY.GDP.MKTP.KD', 'NY.GDP.PCAP.PP.KD', 'SI.POV.GAPS', 'SP.RUR.TOTL.Z
             'SL.UEM.TOTL.FE.ZS', 'SE.PRM.ENRR.FE', 'SP.HOU.FEMA.ZS', 'SP.DYN.LE00.IN', 
             'SI.POV.GINI', 'SH.CON.1524.FE.ZS', 'SH.CON.1524.MA.ZS', 'SP.DYN.CONU.ZS', 
             'SH.IMM.IDPT', 'SH.IMM.MEAS', 'SH.STA.OWGH.ZS', 'SH.PRV.SMOK.FE', 
-            'SH.PRV.SMOK.MA')
+            'SH.PRV.SMOK.MA', 'SP.POP.TOTL')
 
 ### 3. Clean the data
 
@@ -111,6 +111,9 @@ cluster <- plyr::rename(cluster, c("SH.STA.OWGH.ZS" = "Overweight"))
 cluster <- plyr::rename(cluster, c("SH.PRV.SMOK.FE" = "SmokeFem"))
 # SmokeMale <- WDI(indicator = 'SH.PRV.SMOK.MA')
 cluster <- plyr::rename(cluster, c("SH.PRV.SMOK.MA" = "SmokeMale"))
+# Population <- WDI(indicator = 'SP.POP.TOTL')
+cluster <- plyr::rename(cluster, c("SP.POP.TOTL" = "Population"))
+
 
 ## Counting NAs
 sum(is.na(cluster$GDP))
@@ -125,7 +128,7 @@ sum(is.na(cluster$Births))
 sum(is.na(cluster$Water))
 sum(is.na(cluster$Sanitation))
 sum(is.na(cluster$Unemploym))
-sum(is.na(cluster$Childemploy))
+sum(is.na(cluster$Childempl))
 sum(is.na(cluster$Primary))
 sum(is.na(cluster$FemUnempl))
 sum(is.na(cluster$FemSchool))
@@ -142,7 +145,7 @@ sum(is.na(cluster$SmokeFem))
 sum(is.na(cluster$SmokeMale))
 
 # Drop independent variables with more than 20% NAs # 
-Reduced <- cluster[, !(colnames(cluster) %in% c("Poverty", "Electr","FemHead", "CondFem", "CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
+Reduced <- cluster[, !(colnames(cluster) %in% c("Poverty", "Electr","FemHead", "Childempl","CondFem", "CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
 
 
 ## Make sure the variables are already coded as numeric
@@ -158,6 +161,7 @@ cluster$latitude <- as.numeric(cluster$latitude)
 cluster$lending <- as.numeric(cluster$lending)
 cluster$income <- as.numeric(cluster$income)
 
+
 # Checking number of available observation per unique_identifier #
 Reduced$GDPdummy <- as.numeric(!is.na(Reduced$GDP))
 Reduced$GDPpcdummy <- as.numeric(!is.na(Reduced$GDPpc))
@@ -167,7 +171,6 @@ Reduced$HCexpenddummy <- as.numeric(!is.na(Reduced$HCexpend))
 Reduced$Waterdummy <- as.numeric(!is.na(Reduced$Water))
 Reduced$Sanitationdummy <- as.numeric(!is.na(Reduced$Sanitation))
 Reduced$Unemploymdummy <- as.numeric(!is.na(Reduced$Unemploym))
-Reduced$Childempldummy <- as.numeric(!is.na(Reduced$Childempl))
 Reduced$Primarydummy <- as.numeric(!is.na(Reduced$Primary))
 Reduced$FemUnempldummy <- as.numeric(!is.na(Reduced$FemUnempl))
 Reduced$FemSchooldummy <- as.numeric(!is.na(Reduced$FemSchool))
@@ -176,7 +179,7 @@ Reduced$GINIdummy <- as.numeric(!is.na(Reduced$GINI))
 Reduced$DPTdummy <- as.numeric(!is.na(Reduced$DPT))
 Reduced$Measlesdummy <- as.numeric(!is.na(Reduced$Measles))
 
-Reduced$DummySum <- Reduced$GDPdummy + Reduced$GDPpcdummy + Reduced$Ruraldummy + Reduced$CO2dummy + Reduced$HCexpenddummy + Reduced$Waterdummy + Reduced$Sanitationdummy + Reduced$Unemploymdummy + Reduced$Childempldummy + Reduced$Primarydummy + Reduced$FemUnempldummy + Reduced$FemSchooldummy + Reduced$LifeExpectdummy + Reduced$GINIdummy + Reduced$DPTdummy + Reduced$Measlesdummy
+Reduced$DummySum <- Reduced$GDPdummy + Reduced$GDPpcdummy + Reduced$Ruraldummy + Reduced$CO2dummy + Reduced$HCexpenddummy + Reduced$Waterdummy + Reduced$Sanitationdummy + Reduced$Unemploymdummy + Reduced$Primarydummy + Reduced$FemUnempldummy + Reduced$FemSchooldummy + Reduced$LifeExpectdummy + Reduced$GINIdummy + Reduced$DPTdummy + Reduced$Measlesdummy
 
 table(Reduced$DummySum)
 
@@ -186,8 +189,28 @@ Reduced[Reduced$DummySum == '3',]
 Reduced[Reduced$DummySum == '4',]
 Reduced[Reduced$DummySum == '5',]
 
+
 WDIsearch("population, total")
 
+Reduced <- group_by(Reduced, iso2c)
+Reduced <- Reduced[ which(Reduced$Population > 1000000) , ]
+
+cluster$maxpop <- group_by (max(cluster$Population), iso2c)
+?group_by
+
+
+cluster <- group_by(cluster, iso2c)
+cluster <- group_by(cluster, max(Population), add = TRUE)
+cluster <- mutate(cluster, maxPop = max(Population), ) # Christopher's #
+
+subset(cluster, max(Population))
+cluster <- cluster[ which(cluster$max(Population) > 1000000) , ]
+
+
+cluster <- group_by(cluster, iso2c)
+
+cluster$maxpop <- mutate(cluster, maxpop)
+                         
 ### Downloading and preparing UNDAIDS data ###
 
 # The data is publicly available at 'http://www.google.de/url?sa=t&rct=j&q&esrc=s&source=web&cd=1&ved=0CCgQFjAA&url=http%3A%2F%2Fwww.unaids.org%2Fen%2Fmedia%2Funaids%2Fcontentassets%2Fdocuments%2Fdocument%2F2014%2F2014gapreportslides%2FHIV2013Estimates_1990-2013_22July2014.xlsx&ei=0I9XVJyZGoK6af6HAQ&usg=AFQjCNHEjs7Cc82jkTRwrRc8Jq4p2nKqbw&bvm=bv.78677474%2Cd.d2s' #
