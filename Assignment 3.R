@@ -141,6 +141,9 @@ sum(is.na(cluster$Overweight))
 sum(is.na(cluster$SmokeFem))
 sum(is.na(cluster$SmokeMale))
 
+# Drop independent variables with more than 20% NAs # 
+Reduced <- cluster[, !(colnames(cluster) %in% c("Poverty", "Electr","FemHead", "CondFem", "CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
+
 
 ## Make sure the variables are already coded as numeric
 str(cluster) 
@@ -154,6 +157,36 @@ cluster$longitude <- as.numeric(cluster$longitude)
 cluster$latitude <- as.numeric(cluster$latitude)
 cluster$lending <- as.numeric(cluster$lending)
 cluster$income <- as.numeric(cluster$income)
+
+# Checking number of available observation per unique_identifier #
+Reduced$GDPdummy <- as.numeric(!is.na(Reduced$GDP))
+Reduced$GDPpcdummy <- as.numeric(!is.na(Reduced$GDPpc))
+Reduced$Ruraldummy <- as.numeric(!is.na(Reduced$Rural))
+Reduced$CO2dummy <- as.numeric(!is.na(Reduced$CO2))
+Reduced$HCexpenddummy <- as.numeric(!is.na(Reduced$HCexpend))
+Reduced$Waterdummy <- as.numeric(!is.na(Reduced$Water))
+Reduced$Sanitationdummy <- as.numeric(!is.na(Reduced$Sanitation))
+Reduced$Unemploymdummy <- as.numeric(!is.na(Reduced$Unemploym))
+Reduced$Childempldummy <- as.numeric(!is.na(Reduced$Childempl))
+Reduced$Primarydummy <- as.numeric(!is.na(Reduced$Primary))
+Reduced$FemUnempldummy <- as.numeric(!is.na(Reduced$FemUnempl))
+Reduced$FemSchooldummy <- as.numeric(!is.na(Reduced$FemSchool))
+Reduced$LifeExpectdummy <- as.numeric(!is.na(Reduced$LifeExpect))
+Reduced$GINIdummy <- as.numeric(!is.na(Reduced$GINI))
+Reduced$DPTdummy <- as.numeric(!is.na(Reduced$DPT))
+Reduced$Measlesdummy <- as.numeric(!is.na(Reduced$Measles))
+
+Reduced$DummySum <- Reduced$GDPdummy + Reduced$GDPpcdummy + Reduced$Ruraldummy + Reduced$CO2dummy + Reduced$HCexpenddummy + Reduced$Waterdummy + Reduced$Sanitationdummy + Reduced$Unemploymdummy + Reduced$Childempldummy + Reduced$Primarydummy + Reduced$FemUnempldummy + Reduced$FemSchooldummy + Reduced$LifeExpectdummy + Reduced$GINIdummy + Reduced$DPTdummy + Reduced$Measlesdummy
+
+table(Reduced$DummySum)
+
+Reduced[Reduced$DummySum == '1',]
+Reduced[Reduced$DummySum == '2',]
+Reduced[Reduced$DummySum == '3',]
+Reduced[Reduced$DummySum == '4',]
+Reduced[Reduced$DummySum == '5',]
+
+WDIsearch("population, total")
 
 ### Downloading and preparing UNDAIDS data ###
 
