@@ -7,8 +7,6 @@
 library(RJSONIO)
 # install.packages("WDI")  
 library(WDI)
-# install.packages("randomNames")  
-library(randomNames)
 # install.packages("dplyr")  
 library(dplyr) 
 # install.packages("tidyr")  
@@ -44,7 +42,7 @@ countries <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TR
 countries <- countries[countries$region != "Aggregates", ]
 
 # Get rid of rows where all variables are missing
-countries <- countries[which(rowSums(!is.na(countries[, indicators])) > 0), ]
+countries <- countries[which(rowSums(!is.na(countries[, wbdata])) > 0), ]
 
 # Get rid of rows where information on variable iso2c is missing
 countries <- countries[!is.na(countries$iso2c),]
@@ -129,12 +127,12 @@ sum(is.na(cluster$Water))
 sum(is.na(cluster$Sanitation))
 sum(is.na(cluster$Unemploym))
 sum(is.na(cluster$Childempl))
-sum(is.na(cluster$Primary))
+sum(is.na(Reduced$Primary))
 sum(is.na(cluster$FemUnempl))
 sum(is.na(cluster$FemSchool))
 sum(is.na(cluster$FemHead))
 sum(is.na(cluster$LifeExpect))
-sum(is.na(cluster$Gini))
+sum(is.na(cluster$GINI))
 sum(is.na(cluster$CondFem))
 sum(is.na(cluster$CondMale))
 sum(is.na(cluster$Contraceptive))
@@ -144,8 +142,14 @@ sum(is.na(cluster$Overweight))
 sum(is.na(cluster$SmokeFem))
 sum(is.na(cluster$SmokeMale))
 
+sum(is.na(Reduced$GINI))
+as.numeric(Reduced$Gini)
+str(Reduced$Gini)
+
+cluster <- cluster[ which(cluster$Population > 1000000) , ]
+
 # Drop independent variables with more than 20% NAs # 
-Reduced <- cluster[, !(colnames(cluster) %in% c("Poverty", "Electr","FemHead", "Childempl","CondFem", "CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
+Reduced <- cluster[, !(colnames(cluster) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
 
 
 ## Make sure the variables are already coded as numeric
@@ -192,22 +196,28 @@ Reduced[Reduced$DummySum == '5',]
 
 WDIsearch("population, total")
 
-Reduced <- group_by(Reduced, iso2c)
-Reduced <- Reduced[ which(Reduced$Population > 1000000) , ]
-
-cluster$maxpop <- group_by (max(cluster$Population), iso2c)
-?group_by
 
 
+
+
+cluster$maxpop <- max(cluster$Population)
+
+as.numeric(cluster$maxpop)
+str(cluster$maxpop)
+cluster$maxpop <- cluster$max(Population)*1
+str(cluster$max(Population))
+mean(cluster$max(Population))
+head(cluster)
+names(cluster)
+as.numeric(cluster$max(Population))
 cluster <- group_by(cluster, iso2c)
 cluster <- group_by(cluster, max(Population), add = TRUE)
-cluster <- mutate(cluster, maxPop = max(Population), ) # Christopher's #
 
-subset(cluster, max(Population))
-cluster <- cluster[ which(cluster$max(Population) > 1000000) , ]
+str(group_by(cluster, iso2c) %>% subset(cluster, cluster$maxpop > 1000000))
+group_by(cluster, iso2c) %>% select(Population>1000000, iso2c)
 
-
-cluster <- group_by(cluster, iso2c)
+cluster <- subset(cluster, cluster$maxpop > 1000000,) %>% group_by(cluster, iso2c)
+?subset
 
 cluster$maxpop <- mutate(cluster, maxpop)
                          
