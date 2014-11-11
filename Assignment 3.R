@@ -37,189 +37,163 @@ wbdata <- c('NY.GDP.MKTP.KD', 'NY.GDP.PCAP.PP.KD', 'SI.POV.GAPS', 'SP.RUR.TOTL.Z
 
 ### 3. Clean the data
 
-## Look at countries only and get rid of Regions
-countries <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE)
-countries <- countries[countries$region != "Aggregates", ]
+## Look at dataset only and get rid of Regions
+dataset <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE)
+dataset <- dataset[dataset$region != "Aggregates", ]
 
 # Get rid of rows where all variables are missing
-countries <- countries[which(rowSums(!is.na(countries[, wbdata])) > 0), ]
+dataset <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
 
 # Get rid of rows where information on variable iso2c is missing
-countries <- countries[!is.na(countries$iso2c),]
+dataset <- dataset[!is.na(dataset$iso2c),]
 
-## Order the countries and the years
-# Cluster the observations by country
-cluster <- group_by(countries, iso2c)
+## Order the dataset and the years
+# dataset the observations by country
+dataset <- group_by(dataset, iso2c)
 
-# Order the country clusters by year (ascending)
-cluster <- arrange(cluster, iso2c, year)
+# Order the country datasets by year (ascending)
+dataset <- arrange(dataset, iso2c, year)
 
 ## Rename all the Variables with simple names
 # GDP <- WDI(indicator = 'NY.GDP.MKTP.KD')
-cluster <- plyr::rename(cluster, c("NY.GDP.MKTP.KD" = "GDP"))
+dataset <- plyr::rename(dataset, c("NY.GDP.MKTP.KD" = "GDP"))
 # GDPpc <- WDI(indicator = 'NY.GDP.PCAP.PP.KD')
-cluster <- plyr::rename(cluster, c("NY.GDP.PCAP.PP.KD" = "GDPpc"))
+dataset <- plyr::rename(dataset, c("NY.GDP.PCAP.PP.KD" = "GDPpc"))
 # Poverty <- WDI(indicator = 'SI.POV.GAPS')
-cluster <- plyr::rename(cluster, c("SI.POV.GAPS" = "Poverty"))
+dataset <- plyr::rename(dataset, c("SI.POV.GAPS" = "Poverty"))
 # Rural <- WDI(indicator = 'SP.RUR.TOTL.ZS')
-cluster <- plyr::rename(cluster, c("SP.RUR.TOTL.ZS" = "Rural"))
+dataset <- plyr::rename(dataset, c("SP.RUR.TOTL.ZS" = "Rural"))
 # CO2 <- WDI(indicator = 'EN.ATM.CO2E.PC')
-cluster <- plyr::rename(cluster, c("EN.ATM.CO2E.PC" = "CO2"))
+dataset <- plyr::rename(dataset, c("EN.ATM.CO2E.PC" = "CO2"))
 # Electr <- WDI(indicator = 'EG.ELC.ACCS.ZS')
-cluster <- plyr::rename(cluster, c("EG.ELC.ACCS.ZS" = "Electr"))
+dataset <- plyr::rename(dataset, c("EG.ELC.ACCS.ZS" = "Electr"))
 # HCexpend <- WDI(indicator = 'SH.XPD.TOTL.ZS')
-cluster <- plyr::rename(cluster, c("SH.XPD.TOTL.ZS" = "HCexpend"))
+dataset <- plyr::rename(dataset, c("SH.XPD.TOTL.ZS" = "HCexpend"))
 # HCexpendpc <- WDI(indicator = 'SH.XPD.PCAP')
-cluster <- plyr::rename(cluster, c("SH.XPD.PCAP" = "HCexpendpc"))
+dataset <- plyr::rename(dataset, c("SH.XPD.PCAP" = "HCexpendpc"))
 # Births <- WDI(indicator = 'SH.MED.BEDS.ZS')
-cluster <- plyr::rename(cluster, c("SH.MED.BEDS.ZS" = "Births"))
+dataset <- plyr::rename(dataset, c("SH.MED.BEDS.ZS" = "Births"))
 # Water <- WDI(indicator = 'SH.H2O.SAFE.ZS')
-cluster <- plyr::rename(cluster, c("SH.H2O.SAFE.ZS" = "Water"))
+dataset <- plyr::rename(dataset, c("SH.H2O.SAFE.ZS" = "Water"))
 # Sanitation <- WDI(indicator = 'SH.STA.ACSN')
-cluster <- plyr::rename(cluster, c("SH.STA.ACSN" = "Sanitation"))
+dataset <- plyr::rename(dataset, c("SH.STA.ACSN" = "Sanitation"))
 # Unemploym <- WDI(indicator = 'SL.UEM.TOTL.ZS')
-cluster <- plyr::rename(cluster, c("SL.UEM.TOTL.ZS" = "Unemploym"))
+dataset <- plyr::rename(dataset, c("SL.UEM.TOTL.ZS" = "Unemploym"))
 # Childempl <- WDI(indicator = 'SL.TLF.0714.WK.ZS')
-cluster <- plyr::rename(cluster, c("SL.TLF.0714.WK.ZS" = "Childempl"))
+dataset <- plyr::rename(dataset, c("SL.TLF.0714.WK.ZS" = "Childempl"))
 # Primary <- WDI(indicator = 'SE.PRM.ENRR')
-cluster <- plyr::rename(cluster, c("SE.PRM.ENRR" = "Primary"))
+dataset <- plyr::rename(dataset, c("SE.PRM.ENRR" = "Primary"))
 # FemUnempl <- WDI(indicator = 'SL.UEM.TOTL.FE.ZS')
-cluster <- plyr::rename(cluster, c("SL.UEM.TOTL.FE.ZS" = "FemUnempl"))
+dataset <- plyr::rename(dataset, c("SL.UEM.TOTL.FE.ZS" = "FemUnempl"))
 # FemSchool <- WDI(indicator = 'SE.PRM.ENRR.FE')
-cluster <- plyr::rename(cluster, c("SE.PRM.ENRR.FE" = "FemSchool"))
+dataset <- plyr::rename(dataset, c("SE.PRM.ENRR.FE" = "FemSchool"))
 # FemHead <- WDI(indicator = 'SSP.HOU.FEMA.ZS')
-cluster <- plyr::rename(cluster, c("SP.HOU.FEMA.ZS" = "FemHead"))
+dataset <- plyr::rename(dataset, c("SP.HOU.FEMA.ZS" = "FemHead"))
 # LifeExpect <- WDI(indicator = 'SP.DYN.LE00.IN')
-cluster <- plyr::rename(cluster, c("SP.DYN.LE00.IN" = "LifeExpect"))
+dataset <- plyr::rename(dataset, c("SP.DYN.LE00.IN" = "LifeExpect"))
 # GINI <- WDI(indicator = 'SI.POV.GINI')
-cluster <- plyr::rename(cluster, c("SI.POV.GINI" = "GINI"))
+dataset <- plyr::rename(dataset, c("SI.POV.GINI" = "GINI"))
 # CondFem <- WDI(indicator = 'SH.CON.1524.FE.ZS')
-cluster <- plyr::rename(cluster, c("SH.CON.1524.FE.ZS" = "CondFem"))
+dataset <- plyr::rename(dataset, c("SH.CON.1524.FE.ZS" = "CondFem"))
 # CondMale <- WDI(indicator = 'SH.CON.1524.MA.ZS')
-cluster <- plyr::rename(cluster, c("SH.CON.1524.MA.ZS" = "CondMale"))
+dataset <- plyr::rename(dataset, c("SH.CON.1524.MA.ZS" = "CondMale"))
 # Contraceptive <- WDI(indicator = 'SP.DYN.CONU.ZS')
-cluster <- plyr::rename(cluster, c("SP.DYN.CONU.ZS" = "Contraceptive"))
+dataset <- plyr::rename(dataset, c("SP.DYN.CONU.ZS" = "Contraceptive"))
 # DPT <- WDI(indicator = 'SH.IMM.IDPT')
-cluster <- plyr::rename(cluster, c("SH.IMM.IDPT" = "DPT"))
+dataset <- plyr::rename(dataset, c("SH.IMM.IDPT" = "DPT"))
 # Measles <- WDI(indicator = 'SH.IMM.MEAS')
-cluster <- plyr::rename(cluster, c("SH.IMM.MEAS" = "Measles"))
+dataset <- plyr::rename(dataset, c("SH.IMM.MEAS" = "Measles"))
 # Overweight <- WDI(indicator = 'SH.STA.OWGH.ZS')
-cluster <- plyr::rename(cluster, c("SH.STA.OWGH.ZS" = "Overweight"))
+dataset <- plyr::rename(dataset, c("SH.STA.OWGH.ZS" = "Overweight"))
 # SmokeFem <- WDI(indicator = 'SH.PRV.SMOK.FE')
-cluster <- plyr::rename(cluster, c("SH.PRV.SMOK.FE" = "SmokeFem"))
+dataset <- plyr::rename(dataset, c("SH.PRV.SMOK.FE" = "SmokeFem"))
 # SmokeMale <- WDI(indicator = 'SH.PRV.SMOK.MA')
-cluster <- plyr::rename(cluster, c("SH.PRV.SMOK.MA" = "SmokeMale"))
+dataset <- plyr::rename(dataset, c("SH.PRV.SMOK.MA" = "SmokeMale"))
 # Population <- WDI(indicator = 'SP.POP.TOTL')
-cluster <- plyr::rename(cluster, c("SP.POP.TOTL" = "Population"))
+dataset <- plyr::rename(dataset, c("SP.POP.TOTL" = "Population"))
 
 
 ## Counting NAs
-sum(is.na(cluster$GDP))
-sum(is.na(cluster$GDPpc))
-sum(is.na(cluster$Poverty))
-sum(is.na(cluster$Rural))
-sum(is.na(cluster$CO2))
-sum(is.na(cluster$Electr))
-sum(is.na(cluster$HCexpend))
-sum(is.na(cluster$HCexpendpc))
-sum(is.na(cluster$Births))
-sum(is.na(cluster$Water))
-sum(is.na(cluster$Sanitation))
-sum(is.na(cluster$Unemploym))
-sum(is.na(cluster$Childempl))
-sum(is.na(Reduced$Primary))
-sum(is.na(cluster$FemUnempl))
-sum(is.na(cluster$FemSchool))
-sum(is.na(cluster$FemHead))
-sum(is.na(cluster$LifeExpect))
-sum(is.na(cluster$GINI))
-sum(is.na(cluster$CondFem))
-sum(is.na(cluster$CondMale))
-sum(is.na(cluster$Contraceptive))
-sum(is.na(cluster$DPT))
-sum(is.na(cluster$Measles))
-sum(is.na(cluster$Overweight))
-sum(is.na(cluster$SmokeFem))
-sum(is.na(cluster$SmokeMale))
-
-sum(is.na(Reduced$GINI))
-as.numeric(Reduced$Gini)
-str(Reduced$Gini)
-
-cluster <- cluster[ which(cluster$Population > 1000000) , ]
+sum(is.na(dataset$GDP))
+sum(is.na(dataset$GDPpc))
+sum(is.na(dataset$Poverty))
+sum(is.na(dataset$Rural))
+sum(is.na(dataset$CO2))
+sum(is.na(dataset$Electr))
+sum(is.na(dataset$HCexpend))
+sum(is.na(dataset$HCexpendpc))
+sum(is.na(dataset$Births))
+sum(is.na(dataset$Water))
+sum(is.na(dataset$Sanitation))
+sum(is.na(dataset$Unemploym))
+sum(is.na(dataset$Childempl))
+sum(is.na(dataset$Primary))
+sum(is.na(dataset$FemUnempl))
+sum(is.na(dataset$FemSchool))
+sum(is.na(dataset$FemHead))
+sum(is.na(dataset$LifeExpect))
+sum(is.na(dataset$GINI))
+sum(is.na(dataset$CondFem))
+sum(is.na(dataset$CondMale))
+sum(is.na(dataset$Contraceptive))
+sum(is.na(dataset$DPT))
+sum(is.na(dataset$Measles))
+sum(is.na(dataset$Overweight))
+sum(is.na(dataset$SmokeFem))
+sum(is.na(dataset$SmokeMale))
 
 # Drop independent variables with more than 20% NAs # 
-Reduced <- cluster[, !(colnames(cluster) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
+dataset <- dataset[, !(colnames(dataset) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
 
+# Drop small countries (population below one million) #
+dataset <- dataset[ which(dataset$Population > 1000000) , ]
 
-## Make sure the variables are already coded as numeric
-str(cluster) 
-summary(cluster)
+## Make sure the variables are already coded as numeric #
+str(dataset) 
+summary(dataset)
+table (dataset$year)
 
-# Recode all 'factor variables'as numeric if possible
-cluster$SmokeFem <- as.numeric(cluster$SmokeFem)
-cluster$SmokeMale <- as.numeric(cluster$SmokeMale)
-cluster$capital <- as.numeric(cluster$capital)
-cluster$longitude <- as.numeric(cluster$longitude)
-cluster$latitude <- as.numeric(cluster$latitude)
-cluster$lending <- as.numeric(cluster$lending)
-cluster$income <- as.numeric(cluster$income)
+# Recode all 'factor variables'as numeric if possible #
+dataset$capital <- as.numeric(dataset$capital)
+dataset$longitude <- as.numeric(dataset$longitude)
+dataset$latitude <- as.numeric(dataset$latitude)
+dataset$lending <- as.numeric(dataset$lending)
+dataset$income <- as.numeric(dataset$income)
 
 
 # Checking number of available observation per unique_identifier #
-Reduced$GDPdummy <- as.numeric(!is.na(Reduced$GDP))
-Reduced$GDPpcdummy <- as.numeric(!is.na(Reduced$GDPpc))
-Reduced$Ruraldummy <- as.numeric(!is.na(Reduced$Rural))
-Reduced$CO2dummy <- as.numeric(!is.na(Reduced$CO2))
-Reduced$HCexpenddummy <- as.numeric(!is.na(Reduced$HCexpend))
-Reduced$Waterdummy <- as.numeric(!is.na(Reduced$Water))
-Reduced$Sanitationdummy <- as.numeric(!is.na(Reduced$Sanitation))
-Reduced$Unemploymdummy <- as.numeric(!is.na(Reduced$Unemploym))
-Reduced$Primarydummy <- as.numeric(!is.na(Reduced$Primary))
-Reduced$FemUnempldummy <- as.numeric(!is.na(Reduced$FemUnempl))
-Reduced$FemSchooldummy <- as.numeric(!is.na(Reduced$FemSchool))
-Reduced$LifeExpectdummy <- as.numeric(!is.na(Reduced$LifeExpect))
-Reduced$GINIdummy <- as.numeric(!is.na(Reduced$GINI))
-Reduced$DPTdummy <- as.numeric(!is.na(Reduced$DPT))
-Reduced$Measlesdummy <- as.numeric(!is.na(Reduced$Measles))
+dataset$GDPdummy <- as.numeric(!is.na(dataset$GDP))
+dataset$GDPpcdummy <- as.numeric(!is.na(dataset$GDPpc))
+dataset$Ruraldummy <- as.numeric(!is.na(dataset$Rural))
+dataset$CO2dummy <- as.numeric(!is.na(dataset$CO2))
+dataset$HCexpenddummy <- as.numeric(!is.na(dataset$HCexpend))
+dataset$Waterdummy <- as.numeric(!is.na(dataset$Water))
+dataset$Sanitationdummy <- as.numeric(!is.na(dataset$Sanitation))
+dataset$Unemploymdummy <- as.numeric(!is.na(dataset$Unemploym))
+dataset$Primarydummy <- as.numeric(!is.na(dataset$Primary))
+dataset$FemUnempldummy <- as.numeric(!is.na(dataset$FemUnempl))
+dataset$FemSchooldummy <- as.numeric(!is.na(dataset$FemSchool))
+dataset$LifeExpectdummy <- as.numeric(!is.na(dataset$LifeExpect))
+dataset$DPTdummy <- as.numeric(!is.na(dataset$DPT))
+dataset$Measlesdummy <- as.numeric(!is.na(dataset$Measles))
 
-Reduced$DummySum <- Reduced$GDPdummy + Reduced$GDPpcdummy + Reduced$Ruraldummy + Reduced$CO2dummy + Reduced$HCexpenddummy + Reduced$Waterdummy + Reduced$Sanitationdummy + Reduced$Unemploymdummy + Reduced$Primarydummy + Reduced$FemUnempldummy + Reduced$FemSchooldummy + Reduced$LifeExpectdummy + Reduced$GINIdummy + Reduced$DPTdummy + Reduced$Measlesdummy
+dataset$DummySum <- dataset$GDPdummy + dataset$GDPpcdummy + dataset$Ruraldummy + dataset$CO2dummy + dataset$HCexpenddummy + dataset$Waterdummy + dataset$Sanitationdummy + dataset$Unemploymdummy + dataset$Primarydummy + dataset$FemUnempldummy + dataset$FemSchooldummy + dataset$LifeExpectdummy + dataset$GINIdummy + dataset$DPTdummy + dataset$Measlesdummy
 
-table(Reduced$DummySum)
+table(dataset$DummySum)
 
-Reduced[Reduced$DummySum == '1',]
-Reduced[Reduced$DummySum == '2',]
-Reduced[Reduced$DummySum == '3',]
-Reduced[Reduced$DummySum == '4',]
-Reduced[Reduced$DummySum == '5',]
-
-
-WDIsearch("population, total")
+dataset[dataset$DummySum == '1',]
+dataset[dataset$DummySum == '2',]
+dataset[dataset$DummySum == '3',]
+dataset[dataset$DummySum == '4',]
+dataset[dataset$DummySum == '5',]
 
 
+dataset$maxpop <- max(dataset$Population)
 
+dataset <- group_by(dataset, iso2c)
+dataset <- group_by(dataset, max(Population), add = TRUE)
 
-
-cluster$maxpop <- max(cluster$Population)
-
-as.numeric(cluster$maxpop)
-str(cluster$maxpop)
-cluster$maxpop <- cluster$max(Population)*1
-str(cluster$max(Population))
-mean(cluster$max(Population))
-head(cluster)
-names(cluster)
-as.numeric(cluster$max(Population))
-cluster <- group_by(cluster, iso2c)
-cluster <- group_by(cluster, max(Population), add = TRUE)
-
-str(group_by(cluster, iso2c) %>% subset(cluster, cluster$maxpop > 1000000))
-group_by(cluster, iso2c) %>% select(Population>1000000, iso2c)
-
-cluster <- subset(cluster, cluster$maxpop > 1000000,) %>% group_by(cluster, iso2c)
-?subset
-
-cluster$maxpop <- mutate(cluster, maxpop)
+dataset <- mutate(dataset, maxPop = max(Population), ) # Christopher's suggestion#
                          
 ### Downloading and preparing UNDAIDS data ###
 
@@ -278,11 +252,15 @@ data <- mutate(group_data,
 
 install.packages('reshape')
 library(reshape)
-cast(cluster, iso2c ~ year)
+cast(dataset, iso2c ~ year)
 
 # 1.4. For the variables, where less than 40% were missing, we impute predicted values for the NAs
+Probe <- dataset[ which(dataset$Population > 60000000) , ]
+Probe <- Probe[, !(colnames(Probe) %in% c("Primary"))]
+Probe <- Probe[, !(colnames(Probe) %in% c("FemSchool"))]
 
-a.out <- amelia(cluster, idvars = c("iso2c", "year"))
+
+a.out <- amelia(Probe, idvars = c("iso2c", "year", "GDP", "CO2"), bounds = NULL)
 summary(a.out)
 ?amelia
 amelia(mdi,m=5,p2s=2,idvars=ids,noms=noms,ords=ords,collect=FALSE,
