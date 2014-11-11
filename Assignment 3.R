@@ -177,7 +177,7 @@ dataset$LifeExpectdummy <- as.numeric(!is.na(dataset$LifeExpect))
 dataset$DPTdummy <- as.numeric(!is.na(dataset$DPT))
 dataset$Measlesdummy <- as.numeric(!is.na(dataset$Measles))
 
-dataset$DummySum <- dataset$GDPdummy + dataset$GDPpcdummy + dataset$Ruraldummy + dataset$CO2dummy + dataset$HCexpenddummy + dataset$Waterdummy + dataset$Sanitationdummy + dataset$Unemploymdummy + dataset$Primarydummy + dataset$FemUnempldummy + dataset$FemSchooldummy + dataset$LifeExpectdummy + dataset$GINIdummy + dataset$DPTdummy + dataset$Measlesdummy
+dataset$DummySum <- dataset$GDPdummy + dataset$GDPpcdummy + dataset$Ruraldummy + dataset$CO2dummy + dataset$HCexpenddummy + dataset$Waterdummy + dataset$Sanitationdummy + dataset$Unemploymdummy + dataset$Primarydummy + dataset$FemUnempldummy + dataset$FemSchooldummy + dataset$LifeExpectdummy + dataset$DPTdummy + dataset$Measlesdummy
 
 table(dataset$DummySum)
 
@@ -186,6 +186,7 @@ dataset[dataset$DummySum == '2',]
 dataset[dataset$DummySum == '3',]
 dataset[dataset$DummySum == '4',]
 dataset[dataset$DummySum == '5',]
+dataset[dataset$DummySum == '6',]
 
 
 dataset$maxpop <- max(dataset$Population)
@@ -260,7 +261,7 @@ Probe <- Probe[, !(colnames(Probe) %in% c("Primary"))]
 Probe <- Probe[, !(colnames(Probe) %in% c("FemSchool"))]
 
 
-a.out <- amelia(Probe, idvars = c("iso2c", "year", "GDP", "CO2"), bounds = NULL)
+a.out <- amelia(dataset, idvars = c("iso2c", "year"), bounds = NULL)
 summary(a.out)
 ?amelia
 amelia(mdi,m=5,p2s=2,idvars=ids,noms=noms,ords=ords,collect=FALSE,
