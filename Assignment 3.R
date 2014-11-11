@@ -220,8 +220,8 @@ sum(is.na(HIVcountry$Incidence))
 # Delete NAs
 HIVcountry <- HIVcountry[!is.na(HIVcountry$Incidence),]
 
-# Code dependent variable as dummy
-HIVcountry$dummy <- as.numeric(!is.na(HIVcountry$Incidence))
+# Create a dummy variable for the logistic regression #
+HIVcountry$dummy <- as.numeric(HIVcountry$Incidence > 0.03)
 
 ################# Handle the missing values for the independent variables !!!
 =======

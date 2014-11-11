@@ -60,3 +60,6 @@ dataset <- group_by(dataset, iso2c)
 dataset <- group_by(dataset, max(Population), add = TRUE)
 
 dataset <- mutate(dataset, maxPop = max(Population), ) # Christopher's suggestion#
+
+# Code dependent variable as dummy
+HIVcountry$dummy <- as.numeric(!is.na(HIVcountry$Incidence))
