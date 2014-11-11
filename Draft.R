@@ -31,3 +31,32 @@ dataset <- subset(dataset, dataset$maxpop > 1000000,) %>% group_by(dataset, iso2
 ?subset
 
 dataset$maxpop <- mutate(dataset, maxpop)
+
+## Handle the missing values for the independent variables !!!
+
+# 1. For the independent variables, we drop the variable for a country, 
+# if more than 40% of the variable is coded as NA
+
+# 1.1 Create dummy variable that is one or zero depending whether there is an NA or not NA
+### !!!! WRONG VARIABLE !!!!
+HIVcountry$dummy <- as.numeric(is.na(HIVcountry$Col9))
+
+# 1.2 Use dplyr package - group by- mutate & sum 
+group_data <- group_by(HIVcountry, iso2c)
+
+data <- mutate(group_data,
+               sumnas = sum(HIVcountry$dummy))
+Probe <- dataset[ which(dataset$Population > 60000000) , ]
+Probe <- Probe[, !(colnames(Probe) %in% c("Primary"))]
+Probe <- Probe[, !(colnames(Probe) %in% c("FemSchool"))]
+
+dataset <- dataset[, !(colnames(dataset) %in% c("iso3c", "region","capital", "longitude", "latitude","income","lending"))]
+dataset <- dataset[, !(colnames(dataset) %in% c("GDPdummy", "GDPpcdummy","Ruraldummy", "CO2dummy", "HCexpenddummy","Waterdummy","Sanitationdummy","Unemploymdummy","Primarydummy","FemUnempldummy","FemSchooldummy","LifeExpectdummy","DPTdummy","Measlesdummy","DummySum"))]
+dataset <- dataset[, !(colnames(dataset) %in% c("country"))]
+
+dataset$maxpop <- max(dataset$Population)
+
+dataset <- group_by(dataset, iso2c)
+dataset <- group_by(dataset, max(Population), add = TRUE)
+
+dataset <- mutate(dataset, maxPop = max(Population), ) # Christopher's suggestion#

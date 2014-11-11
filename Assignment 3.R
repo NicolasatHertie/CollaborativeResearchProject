@@ -188,20 +188,11 @@ dataset[dataset$DummySum == '4',]
 dataset[dataset$DummySum == '5',]
 dataset[dataset$DummySum == '6',]
 
-# NEW #
-dataset$unique_id <- paste(dataset$iso2c, dataset$year, sep = "_")
-
-
-dataset$maxpop <- max(dataset$Population)
-
-dataset <- group_by(dataset, iso2c)
-dataset <- group_by(dataset, max(Population), add = TRUE)
-
-dataset <- mutate(dataset, maxPop = max(Population), ) # Christopher's suggestion#
                          
 ### Downloading and preparing UNDAIDS data ###
 
-# The data is publicly available at 'http://www.google.de/url?sa=t&rct=j&q&esrc=s&source=web&cd=1&ved=0CCgQFjAA&url=http%3A%2F%2Fwww.unaids.org%2Fen%2Fmedia%2Funaids%2Fcontentassets%2Fdocuments%2Fdocument%2F2014%2F2014gapreportslides%2FHIV2013Estimates_1990-2013_22July2014.xlsx&ei=0I9XVJyZGoK6af6HAQ&usg=AFQjCNHEjs7Cc82jkTRwrRc8Jq4p2nKqbw&bvm=bv.78677474%2Cd.d2s' #
+# The data is publicly available at 
+# 'http://www.google.de/url?sa=t&rct=j&q&esrc=s&source=web&cd=1&ved=0CCgQFjAA&url=http%3A%2F%2Fwww.unaids.org%2Fen%2Fmedia%2Funaids%2Fcontentassets%2Fdocuments%2Fdocument%2F2014%2F2014gapreportslides%2FHIV2013Estimates_1990-2013_22July2014.xlsx&ei=0I9XVJyZGoK6af6HAQ&usg=AFQjCNHEjs7Cc82jkTRwrRc8Jq4p2nKqbw&bvm=bv.78677474%2Cd.d2s' #
 # Save the Excel file in your working directory
 
 # Load the data into R                
@@ -232,9 +223,6 @@ HIVcountry <- HIVcountry[!is.na(HIVcountry$Incidence),]
 # Code dependent variable as dummy
 HIVcountry$dummy <- as.numeric(!is.na(HIVcountry$Incidence))
 
-# NEW #
-HIVcountry$unique_id <- paste(HIVcountry2$iso2c, HIVcountry2$Year, sep = "_")
-
 ################# Handle the missing values for the independent variables !!!
 =======
 
@@ -257,9 +245,6 @@ amelia(mdi,m=5,p2s=2,idvars=ids,noms=noms,ords=ords,collect=FALSE,
 ################################ MERGE THE DATASETS ################################
 ####################################################################################
 
-
-
-
 ### 4. Code dependent variable as dummy - threshold 0.2
 HIVcountry$dummy <- HIVcountry$Col9
 HIVcountry$dummy[HIVcountry$dummy <= 0.2] <- 0
@@ -270,7 +255,14 @@ Merged2 <- merge(dataset, HIVcountry,
                 by = c('iso2c','year'))
 summary(Merged)
 
-R1 <- lm(Incidence ~ GDP + GDPpc + Rural, data = Merged)
-summary(R1)
+####################################################################################
+################################ RUN THE REGRESSIONS ###############################
+####################################################################################
+
+R2 <- lm(Incidence ~ GDP +  Rural, data = Merged)
+summary(R2)
+
+R3 <- lm(Incidence ~ HCexpend, data = Merged)
+summary(R3)
 
 # whats missing #
