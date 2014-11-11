@@ -188,6 +188,9 @@ dataset[dataset$DummySum == '4',]
 dataset[dataset$DummySum == '5',]
 dataset[dataset$DummySum == '6',]
 
+# NEW #
+dataset$unique_id <- paste(dataset$iso2c, dataset$year, sep = "_")
+
 
 dataset$maxpop <- max(dataset$Population)
 
@@ -208,11 +211,11 @@ HIVcountry <- HIVcountry[-c(1:5),-c(3:8,10:41)]
 
 ## Rename all the Variables with simple names
 HIVcountry <- plyr::rename(HIVcountry, c("HIV.estimates.with.uncertainty.bounds" = "Country"))
-HIVcountry <- plyr::rename(HIVcountry, c("Col2" = "Year"))
+HIVcountry <- plyr::rename(HIVcountry, c("Col2" = "year"))
 HIVcountry <- plyr::rename(HIVcountry, c("Col9" = "Incidence"))
 
 # Creating a unique identifier
-HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds, origin = 'country.name', destination = 'iso2c', warn = FALSE)                               
+HIVcountry$iso2c <-countrycode(HIVcountry$Country, origin = 'country.name', destination = 'iso2c', warn = FALSE)                               
 
 # Recoding "..." as NA 
 HIVcountry$Incidence[HIVcountry$Incidence %in% c("...")] <- NA
@@ -224,44 +227,27 @@ HIVcountry$Incidence[HIVcountry$Incidence %in% c("<0.01")] <- 0.009
 sum(is.na(HIVcountry$Incidence)) 
 
 # Delete NAs
-HIVcountry2 <- HIVcountry[!is.na(HIVcountry$Incidence),]
-
-# HIVcountry2 <- subset(HIVcountry, Incidence != NA) <- Christopher wrote this
+HIVcountry <- HIVcountry[!is.na(HIVcountry$Incidence),]
 
 # Code dependent variable as dummy
 HIVcountry$dummy <- as.numeric(!is.na(HIVcountry$Incidence))
 
+# NEW #
+HIVcountry$unique_id <- paste(HIVcountry2$iso2c, HIVcountry2$Year, sep = "_")
+
 ################# Handle the missing values for the independent variables !!!
 =======
 
-## Handle the missing values for the independent variables !!!
-
-# 1. For the independent variables, we drop the variable for a country, 
-# if more than 40% of the variable is coded as NA
-
-# 1.1 Create dummy variable that is one or zero depending whether there is an NA or not NA
-### !!!! WRONG VARIABLE !!!!
-HIVcountry$dummy <- as.numeric(is.na(HIVcountry$Col9))
-
-# 1.2 Use dplyr package - group by- mutate & sum 
-group_data <- group_by(HIVcountry, iso2c)
-
-data <- mutate(group_data,
-               sumnas = sum(HIVcountry$dummy))
-
 # 1.3 Calculate percentage of missings
-
-install.packages('reshape')
+# install.packages('reshape')
 library(reshape)
 cast(dataset, iso2c ~ year)
 
 # 1.4. For the variables, where less than 40% were missing, we impute predicted values for the NAs
-Probe <- dataset[ which(dataset$Population > 60000000) , ]
-Probe <- Probe[, !(colnames(Probe) %in% c("Primary"))]
-Probe <- Probe[, !(colnames(Probe) %in% c("FemSchool"))]
+noms <- c("iso3c", "region","capital", "longitude", "latitude","income","lending","GDPdummy", "GDPpcdummy","Ruraldummy", "CO2dummy", "HCexpenddummy","Waterdummy","Sanitationdummy","Unemploydummy","Primarydummy","FemUnempldummy","FemSchooldummy","LifeExpectdummy","DPTdummy","Measlesdummy","DummySum","country")
+summary(dataset)
 
-
-a.out <- amelia(dataset, idvars = c("iso2c", "year"), bounds = NULL)
+a.out <- amelia(dataset, noms = noms, cs = "iso2c", ts = "year")
 summary(a.out)
 ?amelia
 amelia(mdi,m=5,p2s=2,idvars=ids,noms=noms,ords=ords,collect=FALSE,
@@ -271,51 +257,20 @@ amelia(mdi,m=5,p2s=2,idvars=ids,noms=noms,ords=ords,collect=FALSE,
 ################################ MERGE THE DATASETS ################################
 ####################################################################################
 
-# The data is publicly available at 'http://www.google.de/url?sa=t&rct=j&q&esrc=s&source=web&cd=1&ved=0CCgQFjAA&url=http%3A%2F%2Fwww.unaids.org%2Fen%2Fmedia%2Funaids%2Fcontentassets%2Fdocuments%2Fdocument%2F2014%2F2014gapreportslides%2FHIV2013Estimates_1990-2013_22July2014.xlsx&ei=0I9XVJyZGoK6af6HAQ&usg=AFQjCNHEjs7Cc82jkTRwrRc8Jq4p2nKqbw&bvm=bv.78677474%2Cd.d2s' #
-# Save the Excel file in your working directory
-# tables <- URL %>% GET() %>%
-#   content(as = 'parsed') %>%
-#   readHTMLTable()
-# names(tables)
 
-### 1. Load the Data (Dependent Variable)
-HIV = loadWorkbook("HIV2013Estimates_1990-2013_22July2014.xlsx") 
-HIVcountry = readWorksheet(HIV, sheet="by region - country")
-HIVcountry <- HIVcountry[-c(1:5),-c(3:8,10:41)]
 
-### 2. Create a Unique Identifier
-# countrycode(sourcevar, origin, destination, warn = FALSE) #
-
-HIVcountry$iso2c <-countrycode(HIVcountry$HIV.estimates.with.uncertainty.bounds, origin = 'country.name', destination = 'iso2c', warn = FALSE)                               
-
-# HIVcountry2 <- HIVcountry[,colSums(is.na(HIVcountry))<nrow(HIVcountry)]
-# ?apply
-# HIVcountry3 <- !apply (is.na(HIVcountry), 1, all)
-
-HIVcountrz3 <- subset(HIVcountry, Col9 != NA)
-
-### 3. Clean the Data
-
-## 3.1 Relabel the Variables
-names(HIVcountry)[1] <- "Country"
-names(HIVcountry)[2] <- "Year"
-
-## Change the unique values (<) into numerical values
-# Find variables with unique values (<)
-unique(HIVcountry$Col9)
-# Code the value <0,1 as 0 
-# !!! Command sth like: gsub('<0,1', '0,09', as.numeric) !!!
-
-## 3.2 Handle the Missing Values for the Dependent Variable
-# Drop missings
-
-# Recoding "..." as NA 
-#HIVcountry$Col9[HIVcountry$Col9 %in% c("...")] <- NA
-# subset to get rid of NAs??
 
 ### 4. Code dependent variable as dummy - threshold 0.2
 HIVcountry$dummy <- HIVcountry$Col9
 HIVcountry$dummy[HIVcountry$dummy <= 0.2] <- 0
 HIVcountry$dummy[HIVcountry$dummy > 0.2] <- 1
 
-table(HIVcountry$dummy)
+
+Merged2 <- merge(dataset, HIVcountry,
+                by = c('iso2c','year'))
+summary(Merged)
+
+R1 <- lm(Incidence ~ GDP + GDPpc + Rural, data = Merged)
+summary(R1)
+
+# whats missing #
