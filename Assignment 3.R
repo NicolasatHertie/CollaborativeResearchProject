@@ -26,32 +26,30 @@ library(XLConnect)
 # install.packages("countrycode")
 library("countrycode")
 
-### 2. Load the default data for the years 2000-2012 from the Worldbank database 
+### 2. Load the default data for the years 2000-2012 from the Worldbank database
 wbdata <- c('NY.GDP.MKTP.KD', 'NY.GDP.PCAP.PP.KD', 'SI.POV.GAPS', 'SP.RUR.TOTL.ZS', 
             'EN.ATM.CO2E.PC', 'EG.ELC.ACCS.ZS', 'SH.XPD.TOTL.ZS', 'SH.H2O.SAFE.ZS', 
-            'SH.STA.ACSN', 'SL.UEM.TOTL.ZS','SL.TLF.0714.WK.ZS', 'SE.PRM.ENRR', 
+            'SH.STA.ACSN', 'SL.UEM.TOTL.ZS','SL.TLF.0714.WK.ZS', 'SE.PRM.ENRR', 'SH.XPD.PCAP', 
             'SL.UEM.TOTL.FE.ZS', 'SE.PRM.ENRR.FE', 'SP.HOU.FEMA.ZS', 'SP.DYN.LE00.IN', 
             'SI.POV.GINI', 'SH.CON.1524.FE.ZS', 'SH.CON.1524.MA.ZS', 'SP.DYN.CONU.ZS', 
             'SH.IMM.IDPT', 'SH.IMM.MEAS', 'SH.STA.OWGH.ZS', 'SH.PRV.SMOK.FE', 
-            'SH.PRV.SMOK.MA', 'SP.POP.TOTL')
+            'SH.PRV.SMOK.MA', 'SP.POP.TOTL','SH.MED.BEDS.ZS','SH.STA.BRTC.ZS')
+
+dataset <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE)
 
 ### 3. Clean the data
 
 ## Look at dataset only and get rid of Regions
-dataset <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE)
 dataset <- dataset[dataset$region != "Aggregates", ]
 
-# Get rid of rows where all variables are missing
+# Drop rows where all variables are missing
 dataset <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
 
-# Get rid of rows where information on variable iso2c is missing
+# Drop rows where information on variable iso2c is missing
 dataset <- dataset[!is.na(dataset$iso2c),]
 
-## Order the dataset and the years
-# dataset the observations by country
+## Order the dataset and the years (ascending)
 dataset <- group_by(dataset, iso2c)
-
-# Order the country datasets by year (ascending)
 dataset <- arrange(dataset, iso2c, year)
 
 ## Rename all the Variables with simple names
@@ -72,7 +70,9 @@ dataset <- plyr::rename(dataset, c("SH.XPD.TOTL.ZS" = "HCexpend"))
 # HCexpendpc <- WDI(indicator = 'SH.XPD.PCAP')
 dataset <- plyr::rename(dataset, c("SH.XPD.PCAP" = "HCexpendpc"))
 # Births <- WDI(indicator = 'SH.MED.BEDS.ZS')
-dataset <- plyr::rename(dataset, c("SH.MED.BEDS.ZS" = "Births"))
+dataset <- plyr::rename(dataset, c("SH.STA.BRTC.ZS" = "Births"))
+# HospBeds <- WDI(indicator = 'SH.MED.BEDS.ZS')
+dataset <- plyr::rename(dataset, c("SH.MED.BEDS.ZS" = "HospBeds"))
 # Water <- WDI(indicator = 'SH.H2O.SAFE.ZS')
 dataset <- plyr::rename(dataset, c("SH.H2O.SAFE.ZS" = "Water"))
 # Sanitation <- WDI(indicator = 'SH.STA.ACSN')
@@ -113,7 +113,7 @@ dataset <- plyr::rename(dataset, c("SH.PRV.SMOK.MA" = "SmokeMale"))
 dataset <- plyr::rename(dataset, c("SP.POP.TOTL" = "Population"))
 
 
-## Counting NAs
+## Counting NAs in the independent variables
 sum(is.na(dataset$GDP))
 sum(is.na(dataset$GDPpc))
 sum(is.na(dataset$Poverty))
@@ -141,19 +141,20 @@ sum(is.na(dataset$Measles))
 sum(is.na(dataset$Overweight))
 sum(is.na(dataset$SmokeFem))
 sum(is.na(dataset$SmokeMale))
+sum(is.na(dataset$HospBeds))
 
-# Drop independent variables with more than 20% NAs # 
-dataset <- dataset[, !(colnames(dataset) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
+# Drop independent variables with more than 20% (552) NAs
+dataset <- dataset[, !(colnames(dataset) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","Births","HospBeds","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
 
-# Drop small countries (population below one million) #
+# Drop small countries (population below one million)
 dataset <- dataset[ which(dataset$Population > 1000000) , ]
 
-## Make sure the variables are already coded as numeric #
+## Make sure the variables are already coded as numeric
 str(dataset) 
 summary(dataset)
 table (dataset$year)
 
-# Recode all 'factor variables'as numeric if possible #
+# Recode all 'factor variables'as numeric if possible
 dataset$capital <- as.numeric(dataset$capital)
 dataset$longitude <- as.numeric(dataset$longitude)
 dataset$latitude <- as.numeric(dataset$latitude)
@@ -188,8 +189,11 @@ dataset[dataset$DummySum == '4',]
 dataset[dataset$DummySum == '5',]
 dataset[dataset$DummySum == '6',]
 
-                         
-### Downloading and preparing UNDAIDS data ###
+####################################################################################
+################################ UNAIDS DATASET ####################################
+####################################################################################
+
+### 1. Downloading and preparing UNDAIDS data ###
 
 # The data is publicly available at 
 # 'http://www.google.de/url?sa=t&rct=j&q&esrc=s&source=web&cd=1&ved=0CCgQFjAA&url=http%3A%2F%2Fwww.unaids.org%2Fen%2Fmedia%2Funaids%2Fcontentassets%2Fdocuments%2Fdocument%2F2014%2F2014gapreportslides%2FHIV2013Estimates_1990-2013_22July2014.xlsx&ei=0I9XVJyZGoK6af6HAQ&usg=AFQjCNHEjs7Cc82jkTRwrRc8Jq4p2nKqbw&bvm=bv.78677474%2Cd.d2s' #
@@ -221,37 +225,16 @@ sum(is.na(HIVcountry$Incidence))
 HIVcountry <- HIVcountry[!is.na(HIVcountry$Incidence),]
 
 # Create a dummy variable for the logistic regression #
-HIVcountry$dummy <- as.numeric(HIVcountry$Incidence > 0.03)
+HIVcountry$dummy <- as.numeric(HIVcountry$Incidence > 0.3764337)
+table(HIVcountry$dummy)
 
-################# Handle the missing values for the independent variables !!!
-=======
 
-# 1.3 Calculate percentage of missings
-# install.packages('reshape')
-library(reshape)
-cast(dataset, iso2c ~ year)
-
-# 1.4. For the variables, where less than 40% were missing, we impute predicted values for the NAs
-noms <- c("iso3c", "region","capital", "longitude", "latitude","income","lending","GDPdummy", "GDPpcdummy","Ruraldummy", "CO2dummy", "HCexpenddummy","Waterdummy","Sanitationdummy","Unemploydummy","Primarydummy","FemUnempldummy","FemSchooldummy","LifeExpectdummy","DPTdummy","Measlesdummy","DummySum","country")
-summary(dataset)
-
-a.out <- amelia(dataset, noms = noms, cs = "iso2c", ts = "year")
-summary(a.out)
-?amelia
-amelia(mdi,m=5,p2s=2,idvars=ids,noms=noms,ords=ords,collect=FALSE,
-       + outname="Routput/imputed", write.out=TRUE,empri=NULL)
 
 ####################################################################################
 ################################ MERGE THE DATASETS ################################
 ####################################################################################
 
-### 4. Code dependent variable as dummy - threshold 0.2
-HIVcountry$dummy <- HIVcountry$Col9
-HIVcountry$dummy[HIVcountry$dummy <= 0.2] <- 0
-HIVcountry$dummy[HIVcountry$dummy > 0.2] <- 1
-
-
-Merged2 <- merge(dataset, HIVcountry,
+Merged <- merge(dataset, HIVcountry,
                 by = c('iso2c','year'))
 summary(Merged)
 

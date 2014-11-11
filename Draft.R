@@ -63,3 +63,21 @@ dataset <- mutate(dataset, maxPop = max(Population), ) # Christopher's suggestio
 
 # Code dependent variable as dummy
 HIVcountry$dummy <- as.numeric(!is.na(HIVcountry$Incidence))
+
+# 1.3 Calculate percentage of missings
+# install.packages('reshape')
+library(reshape)
+cast(dataset, iso2c ~ year)
+
+################# Handle the missing values for the independent variables !!!
+=======
+  
+  # 1.4. For the variables, where less than 40% were missing, we impute predicted values for the NAs
+  noms <- c("iso3c", "region","capital", "longitude", "latitude","income","lending","GDPdummy", "GDPpcdummy","Ruraldummy", "CO2dummy", "HCexpenddummy","Waterdummy","Sanitationdummy","Unemploydummy","Primarydummy","FemUnempldummy","FemSchooldummy","LifeExpectdummy","DPTdummy","Measlesdummy","DummySum","country")
+summary(dataset)
+
+a.out <- amelia(dataset, noms = noms, cs = "iso2c", ts = "year")
+summary(a.out)
+?amelia
+amelia(mdi,m=5,p2s=2,idvars=ids,noms=noms,ords=ords,collect=FALSE,
+       + outname="Routput/imputed", write.out=TRUE,empri=NULL)
