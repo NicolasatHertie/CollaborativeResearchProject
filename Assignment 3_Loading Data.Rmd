@@ -13,8 +13,8 @@ toc: yes
 
 ```{r, echo=FALSE}
 
-setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
-# setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
+# setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
+setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
 ### 1. Load Required Packages
 
@@ -49,7 +49,6 @@ library(fmsb)
 # install.packages ("car")
 library(car)
 
-
 ### 2. Load the default data for the years 2000-2012 from the Worldbank database
 wbdata <- c('NY.GDP.MKTP.KD', 'NY.GDP.PCAP.PP.KD', 'SI.POV.GAPS', 'SP.RUR.TOTL.ZS', 
             'EN.ATM.CO2E.PC', 'EG.ELC.ACCS.ZS', 'SH.XPD.TOTL.ZS', 'SH.H2O.SAFE.ZS', 
@@ -67,10 +66,25 @@ dataset <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE
 dataset <- dataset[dataset$region != "Aggregates", ]
 
 # Drop rows where all variables are missing
-dataset <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
+dataset2 <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
+
+# Visualise and count deleted values
+rows.in.a1.that.are.not.in.a2  <- function(dataset,dataset2)
+{
+  dataset.vec <- apply(dataset, 1, paste, collapse = "")
+  dataset2.vec <- apply(dataset2, 1, paste, collapse = "")
+  a1.without.a2.rows <- dataset[!dataset.vec %in% dataset2.vec,]
+  return(a1.without.a2.rows)
+}
+AllNAs <- rows.in.a1.that.are.not.in.a2(dataset,dataset2)
+nrow(AllNAs)
+
+dataset <- dataset2
 
 # Drop rows where information on variable iso2c is missing
-dataset <- dataset[!is.na(dataset$iso2c),]
+dataset2 <- dataset[!is.na(dataset$iso2c),]
+## No observations were dropped ###
+dataset <- dataset2
 
 ## Order the dataset and the years (ascending)
 dataset <- group_by(dataset, iso2c)
@@ -170,6 +184,9 @@ sum(is.na(dataset$HospBeds))
 # Drop independent variables with more than 20% (552) NAs
 dataset <- dataset[, !(colnames(dataset) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","Births","HospBeds","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
 
+# Create a table with countries with a population smaller than one million
+SmallCountries <- dataset[ which(dataset$Population < 1000000) , ]
+
 # Drop small countries (population below one million)
 dataset <- dataset[ which(dataset$Population > 1000000) , ]
 
@@ -185,6 +202,8 @@ dataset$latitude <- as.numeric(dataset$latitude)
 dataset$lending <- as.numeric(dataset$lending)
 dataset$income <- as.numeric(dataset$income)
 
+# Set year as integer
+dataset$year <- as.integer(dataset$year)
 
 # Checking number of available observation per unique_identifier #
 dataset$GDPdummy <- as.numeric(!is.na(dataset$GDP))
@@ -262,7 +281,19 @@ Merged <- merge(dataset, HIVcountry,
                 by = c('iso2c','year'))
 summary(Merged)
 
-write.csv(Merged, file="MergedData")
+# Lagging the dependent variable
+Merged <- slide(Merged, Var = "Incidence", GroupVar = "iso2c", slideBy = -1,
+                          NewVar = "Incidence2")
+
+# Create a file with the difference between the t0 and t1
+Merged$IncidenceDif <- as.numeric(Merged$Incidence) - as.numeric(Merged$Incidence2)
+
+# Create a dummy variable for countries with IndicenceDif>0
+Merged$DDif <- as.numeric(Merged$IncidenceDif>0)
+
+# Clean the database - remove unused columns
+Merged <- Merged[, !(colnames(Merged) %in% c("iso3c", "region","capital", "longitude", "latitude","income","lending","Country"))]
+
 
 ```
 

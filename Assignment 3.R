@@ -290,9 +290,11 @@ library(DataCombine)
 ??xtset
 ts=year cs=iso2c
 HIVcountry <- group_by(HIVcountry,iso2c)
+HIVcountry <- ungroup(HIVcountry)
 HIVcountryg$Incidence1 <- embed(HIVcountryg$Incidence,2)
 HIVcountryg$Incidence2 <- head(lag(HIVcountryg$Incidence, 1))
 HIVIn <- HIVcountry$Incidence
-HIVIn$Incidence2 <- slide(HIVIn, Var = "Incidence", GroupVar = "iso2c", slideBy = -1)
-
+Merged <- slide(Merged, Var = "Incidence", GroupVar = "iso2c", slideBy = -1,
+                          NewVar = "Incidence2")
+all.x = TRUE
 HIVIn <- HIVcountry[, !(colnames(HIVcountry) %in% c("dummy"))]
