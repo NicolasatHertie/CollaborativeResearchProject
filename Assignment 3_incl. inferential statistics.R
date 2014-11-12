@@ -366,6 +366,8 @@ summary(Logit1)
 confint(Logit1)
 
 mean(Merged$lGDP, na.rm=TRUE)
+mean(Merged$lRural, na.rm=TRUE)
+
 
 fitted_L1 <- with(Merged,
                data.frame(mean_GDP = mean(lGDP, na.rm=TRUE),
@@ -377,6 +379,29 @@ fitted_L1 <- with(Merged,
                           mean_Sanitation = mean(lSanitation, na.rm=TRUE),
                           mean_Primary = mean(lPrimary, na.rm=TRUE),
                           mean_Unemploym = mean(lUnemploym, na.rm=TRUE),
-                          , lDPT, lMEasles))
+                          dummy))
 fitted_L1
 
+fitted$predicted <- predict(Logit1, newdata = fitted, type = 'response')
+fitted
+
+
+fitted_L1 <- with(Merged,
+                  data.frame(mean_GDP = mean(lGDP, na.rm=TRUE),
+                             mean_Rural = mean(lRural, na.rm=TRUE),
+                             mean_CO2 = mean(lCO2, na.rm=TRUE),
+                             mean_HCexpend = mean(lHCexpend, na.rm=TRUE),
+                             mean_LifeExpect = mean(lLifeExpect, na.rm=TRUE),
+                             mean_Water = mean(lWater, na.rm=TRUE),
+                             mean_Sanitation = mean(lSanitation, na.rm=TRUE),
+                             mean_Primary = mean(lPrimary, na.rm=TRUE),
+                             mean_Unemploym = mean(lUnemploym, na.rm=TRUE),
+                             , lDPT, lMEasles))
+
+fitted_L1
+
+# How to do the predicted probabilities with so many variables & observations?
+# Logging all the variables?
+# Total number Incidence - OLS => better descriptive statistics
+# some model categories only two variables - enough? shall we keep the categories
+# Cross Tabs needed? Indices for each category
