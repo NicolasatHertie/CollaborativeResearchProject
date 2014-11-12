@@ -12,10 +12,19 @@ toc: yes
 ---
 
 
+<<<<<<< HEAD
 
 ```{r, echo=FALSE}
 
 source('Assignment 3_Loading Data')
+=======
+```{r, echo=FALSE}
+# Setting the Working Directory
+setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
+
+# Loading the data
+source('Assignment 3_Loading Data.Rmd')
+>>>>>>> FETCH_HEAD
 
 
 ####################################################################################
@@ -33,10 +42,17 @@ Merged$Incidence <- as.numeric(Merged$Incidence)
 hist(Merged$Incidence, xlab="HIV Incidence Rate")
 
 # Look at incidence rate per country
+<<<<<<< HEAD
 ggplot2::ggplot(Merged, aes((Difference), country)) + geom_point() + theme_bw()
 
 # Look at incidence over time - seee the general trend
 #plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
+=======
+ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
+
+# Look at incidence over time - seee the general trend
+plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
+>>>>>>> FETCH_HEAD
 #plot_IncTime + theme(axis.title.x = element_blank()) + ylab("Weight (Kg)")
 
 #library(scales)   # Need the scales package
