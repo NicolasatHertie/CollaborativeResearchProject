@@ -262,6 +262,7 @@ Merged <- merge(dataset, HIVcountry,
                 by = c('iso2c','year'))
 summary(Merged)
 
+write.csv(Merged, file="MergedData")
 
 ```
 

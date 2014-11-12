@@ -405,3 +405,6 @@ fitted_L1
 # Total number Incidence - OLS => better descriptive statistics
 # some model categories only two variables - enough? shall we keep the categories
 # Cross Tabs needed? Indices for each category
+
+
+source("http://pj.freefaculty.org/R/WorkingExamples/outreg-worked.R")

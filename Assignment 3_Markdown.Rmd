@@ -13,8 +13,11 @@ toc: yes
 
 
 ```{r, echo=FALSE}
+# Setting the Working Directory
+setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 
-source('Assignment 3_Loading Data')
+# Loading the data
+source('Assignment 3_Loading Data.Rmd')
 
 
 ####################################################################################
@@ -35,7 +38,7 @@ hist(Merged$Incidence, xlab="HIV Incidence Rate")
 ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
 
 # Look at incidence over time - seee the general trend
-#plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
+plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
 #plot_IncTime + theme(axis.title.x = element_blank()) + ylab("Weight (Kg)")
 
 #library(scales)   # Need the scales package
