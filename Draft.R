@@ -69,6 +69,8 @@ HIVcountry$dummy <- as.numeric(!is.na(HIVcountry$Incidence))
 library(reshape)
 cast(dataset, iso2c ~ year)
 
+WDIsearch("health exp")
+
 ################# Handle the missing values for the independent variables !!!
 =======
   
@@ -81,3 +83,5 @@ summary(a.out)
 ?amelia
 amelia(mdi,m=5,p2s=2,idvars=ids,noms=noms,ords=ords,collect=FALSE,
        + outname="Routput/imputed", write.out=TRUE,empri=NULL)
+
+summary(M1,M2)
