@@ -39,7 +39,9 @@ Merged$Incidence <- as.numeric(Merged$Incidence)
 ### 1. Plotting the dependent variable
 
 # Histogram of dependent variable - smaller Intervals???
-hist(Merged$Incidence, xlab="HIV Incidence Rate")
+axis(1,at=c(0,0.5,1,1.5))
+hist(Merged$Incidence, xlab="HIV Incidence Rate", xlim=c(0, 4))
+
 
 # Look at incidence rate per country
 <<<<<<< HEAD
@@ -210,4 +212,5 @@ Merged_L1
 
 # Median for dependent variable
 
-
+levels(factor(Merged$iso2c))
+aggregate(Merged$iso2c, by=list(Merged$iso2c), FUN=mean)[2]
