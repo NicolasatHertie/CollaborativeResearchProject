@@ -1,0 +1,196 @@
+---
+title: "Collaborative Research Project - Assignment 3"
+bibliography:
+- Literature.bib
+- Packages.bib
+date: "24 October 2014"
+output: html_document
+number_sections: yes
+highlight: zenburn
+authors: Meilin Moellenkamp and Nicolas Rosemberg
+toc: yes
+---
+
+
+```{r, echo=FALSE}
+
+source('Assignment 3_Loading Data')
+
+
+####################################################################################
+################################ DESCRIPTIVE STATISTICS ############################
+####################################################################################
+
+# Not all variables are numeric yet
+str(Merged)
+# code dependet variable as numeric
+Merged$Incidence <- as.numeric(Merged$Incidence)
+
+### 1. Plotting the dependent variable
+
+# Histogram of dependent variable - smaller Intervals???
+hist(Merged$Incidence, xlab="HIV Incidence Rate")
+
+# Look at incidence rate per country
+ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
+
+# Look at incidence over time - seee the general trend
+#plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
+#plot_IncTime + theme(axis.title.x = element_blank()) + ylab("Weight (Kg)")
+
+#library(scales)   # Need the scales package
+#bp + scale_y_continuous(labels=percent) +
+     #scale_x_discrete(labels=abbreviate)  # In this particular case, it has no effect
+convert it to integer
+
+# Also possible to set the axis label with the scale
+# Note that vertical space is still reserved for x's label
+bp + scale_x_discrete(name="") +
+     scale_y_continuous(name="Weight (Kg)")
+       
+# Look at the relation between Incidence and Health Care Spending per capita (+ geom_smooth() for fitting a line)
+ggplot2::ggplot(Merged, aes(Incidence, HCexpendpc)) + geom_point() + theme_bw()
+ggplot2::ggplot(Merged, aes(Incidence, HCexpend)) + geom_point() + theme_bw()
+
+
+### 2. Plotting the independent variables
+
+# Scatterplot of general socio-economic, cultural and environmental conditions
+scatterplotMatrix(~ Incidence + + GDP + GDPpc + Rural + CO2 + LifeExpect + Population, 
+                  transform=TRUE, data=Merged)
+
+
+# Scatterplot of living and working conditions 
+scatterplotMatrix(~ Incidence + Water + Sanitation + Primary + Unemploym + HCexpendpc,
+                  transform=TRUE, data=Merged)
+
+
+
+# Scatterplot of individual lifestyle factors
+scatterplotMatrix(~ Incidence + DPT + Measles, transform=TRUE, data=Merged)
+# calculate VIF!!!
+
+# Scatterplot of social and community networks
+scatterplotMatrix(~ FemUnempl + FemSchool, transform=TRUE, data=Merged)
+# calculate VIF!!!
+
+
+
+
+####################################################################################
+################################ INFERENTIAL STATISTICS ###############################
+####################################################################################
+
+## Logging most of the independent variables for better comparability
+Merged$lGDP <- log(Merged$GDP)
+Merged$lGDPpc <- log(Merged$GDPpc)
+Merged$lRural <- log(Merged$Rural)
+Merged$lCO2 <- log(Merged$CO2)
+Merged$lHCexpend <- log(Merged$HCexpend)
+Merged$lWater <- log(Merged$Water)
+Merged$lSanitation <- log(Merged$Sanitation)
+Merged$lUnemploym <- log(Merged$Unemploym)
+Merged$lPrimary <- log(Merged$Primary)
+Merged$lHCexpendpc <- log(Merged$HCexpendpc)
+Merged$lFemUnempl <- log(Merged$FemUnempl)
+Merged$lFemSchool <- log(Merged$FemSchool)
+Merged$lLifeExpect <- log(Merged$LifeExpect)
+Merged$lDPT <- log(Merged$DPT)
+Merged$lMeasles <- log(Merged$Measles)
+
+### Model 1: OLS Regression of all Variables without Cotrols
+M1 <- lm(Incidence ~ lGDP + lRural + lCO2 + lHCexpend + lLifeExpect + lWater + lSanitation + lPrimary 
+         + lUnemploym + lDPT + lMeasles,data=Merged)
+summary(M1)
+confint(M1)
+plot(M1, which = 1)
+
+## Checking for Multicollinearity of the Variables in Model 1
+# Calculating variance inflation factors
+vif(M1)
+
+# Checking for Multicollinearity of the Immunization variables
+Immu <- lm(Incidence ~ lDPT + lMeasles,
+         data=Merged)
+vif(Immu) # variance inflation factors
+
+# Checking for Multicollinearity of the Immunization variables
+GDP <- lm(Incidence ~ lGDP + lRural + lCO2 + lHCexpend + lLifeExpect + lWater + lSanitation + lPrimary 
+          + lUnemploym + lDPT + lMeasles, data=Merged)
+
+vif(GDP) # variance inflation factors
+
+?VIF
+
+### Model 2: OLS Regression of all Variables Model cotrolling for country, population and year effects
+M2 <- lm(Incidence ~ GDPpc + Rural + CO2 + HCexpendpc + LifeExpect + Population + Water + Sanitation 
+         + Primary + Unemploym + FemUnempl + FemSchool + DPT + Measles + Population + iso2c + year,
+         data=Merged)
+summary(M2)
+confint(M2)
+plot(M2, which = 1)
+
+### Model 3: Logistic Regression of all Variables without controls
+
+Logit1 <- glm(dummy ~ lGDP + lRural + lCO2 + lHCexpend + lLifeExpect + lWater + lSanitation + lPrimary 
+              + lUnemploym + lDPT + lMeasles + Population + iso2c + year, data=Merged, family = 'binomial')
+summary(Logit1)
+confint(Logit1)
+
+mean(Merged$lGDP, na.rm=TRUE)
+mean(Merged$lRural, na.rm=TRUE)
+
+
+Merged_L1 <- with(Merged,
+               data.frame(mean_GDP = mean(lGDP, na.rm=TRUE),
+                          mean_Rural = mean(lRural, na.rm=TRUE),
+                          mean_CO2 = mean(lCO2, na.rm=TRUE),
+                          mean_HCexpend = mean(lHCexpend, na.rm=TRUE),
+                          mean_LifeExpect = mean(lLifeExpect, na.rm=TRUE),
+                          mean_Water = mean(lWater, na.rm=TRUE),
+                          mean_Sanitation = mean(lSanitation, na.rm=TRUE),
+                          mean_Primary = mean(lPrimary, na.rm=TRUE),
+                          mean_Unemploym = mean(lUnemploym, na.rm=TRUE),
+                          lMeasles=quantiles))
+Merged_L1
+
+Merged_L1 <- with(Merged,
+               data.frame(mean_GDP = mean(lGDP, na.rm=TRUE),
+                          mean_Rural = mean(lRural, na.rm=TRUE),
+                          mean_CO2 = mean(lCO2, na.rm=TRUE),
+                          mean_HCexpend = mean(lHCexpend, na.rm=TRUE),
+                          mean_LifeExpect = mean(lLifeExpect, na.rm=TRUE),
+                          mean_Water = mean(lWater, na.rm=TRUE),
+                          mean_Sanitation = mean(lSanitation, na.rm=TRUE),
+                          mean_Primary = mean(lPrimary, na.rm=TRUE),
+                          mean_Unemploym = mean(lUnemploym, na.rm=TRUE)))
+# function (quantiles)
+# summary on data file
+
+# geom(gitter)
+# increase fig wisth fig height
+# fond size
+
+# random line (y/x) ggplot - xaxis line
+
+
+Merged_L1
+# Error: Merged$predicted <- predict(Logit1, newdata = Merged_L1, type = 'response')
+
+
+
+```
+
+#Questions
+- How to do the predicted probabilities with so many variables & observations?
+- Logging all the variables?
+- some model categories only two variables - enough? shall we keep the categories
+- Cross Tabs needed? Indices for each category
+- Healthcare Spending pc and GDP pc highly collinear => GDP - Healthcare spending 
+  => amount of GDP spend for Healthcare instead of Healthcare spending per capita? 
+  drop GDP & Healthcare spending???
+- How to change the axis scale
+
+# Median for dependent variable
+
+
