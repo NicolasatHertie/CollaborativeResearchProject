@@ -278,14 +278,24 @@ Merged$Incidence <- as.numeric(Merged$Incidence)
 
 # Histogram of dependent variable - smaller Intervals???
 hist(Merged$Incidence, xlab="HIV Incidence Rate")
-hist(log(Merged$Incidence), xlab="HIV Incidence Rate")
 
 # Look at incidence rate per country
 ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
 
 # Look at incidence over time - seee the general trend
-ggplot(aes(x = year, y = Incidence), data = Merged) + geom_point() + theme_bw() + geom_smooth()
+#plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
+#plot_IncTime + theme(axis.title.x = element_blank()) + ylab("Weight (Kg)")
 
+#library(scales)   # Need the scales package
+#bp + scale_y_continuous(labels=percent) +
+     #scale_x_discrete(labels=abbreviate)  # In this particular case, it has no effect
+convert it to integer
+
+# Also possible to set the axis label with the scale
+# Note that vertical space is still reserved for x's label
+bp + scale_x_discrete(name="") +
+     scale_y_continuous(name="Weight (Kg)")
+       
 # Look at the relation between Incidence and Health Care Spending per capita (+ geom_smooth() for fitting a line)
 ggplot2::ggplot(Merged, aes(Incidence, HCexpendpc)) + geom_point() + theme_bw()
 ggplot2::ggplot(Merged, aes(Incidence, HCexpend)) + geom_point() + theme_bw()
@@ -371,7 +381,7 @@ plot(M2, which = 1)
 ### Model 3: Logistic Regression of all Variables without controls
 
 Logit1 <- glm(dummy ~ lGDP + lRural + lCO2 + lHCexpend + lLifeExpect + lWater + lSanitation + lPrimary 
-              + lUnemploym + lDPT + lMeasles, data=Merged, family = 'binomial')
+              + lUnemploym + lDPT + lMeasles + Population + iso2c + year, data=Merged, family = 'binomial')
 summary(Logit1)
 confint(Logit1)
 
@@ -389,7 +399,28 @@ Merged_L1 <- with(Merged,
                           mean_Sanitation = mean(lSanitation, na.rm=TRUE),
                           mean_Primary = mean(lPrimary, na.rm=TRUE),
                           mean_Unemploym = mean(lUnemploym, na.rm=TRUE),
-                          dummy))
+                          lMeasles=quantiles))
+Merged_L1
+
+Merged_L1 <- with(Merged,
+               data.frame(mean_GDP = mean(lGDP, na.rm=TRUE),
+                          mean_Rural = mean(lRural, na.rm=TRUE),
+                          mean_CO2 = mean(lCO2, na.rm=TRUE),
+                          mean_HCexpend = mean(lHCexpend, na.rm=TRUE),
+                          mean_LifeExpect = mean(lLifeExpect, na.rm=TRUE),
+                          mean_Water = mean(lWater, na.rm=TRUE),
+                          mean_Sanitation = mean(lSanitation, na.rm=TRUE),
+                          mean_Primary = mean(lPrimary, na.rm=TRUE),
+                          mean_Unemploym = mean(lUnemploym, na.rm=TRUE)))
+# function (quantiles)
+# summary on data file
+
+# geom(gitter)
+# increase fig wisth fig height
+# fond size
+
+# random line (y/x) ggplot - xaxis line
+
 
 Merged_L1
 # Error: Merged$predicted <- predict(Logit1, newdata = Merged_L1, type = 'response')
@@ -401,9 +432,13 @@ Merged_L1
 #Questions
 - How to do the predicted probabilities with so many variables & observations?
 - Logging all the variables?
-- Total number Incidence - OLS => better descriptive statistics
 - some model categories only two variables - enough? shall we keep the categories
 - Cross Tabs needed? Indices for each category
 - Healthcare Spending pc and GDP pc highly collinear => GDP - Healthcare spending 
   => amount of GDP spend for Healthcare instead of Healthcare spending per capita? 
   drop GDP & Healthcare spending???
+- How to change the axis scale
+
+# Median for dependent variable
+
+
