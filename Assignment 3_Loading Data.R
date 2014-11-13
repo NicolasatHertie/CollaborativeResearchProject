@@ -1,11 +1,11 @@
 ####################################################################################
-########## SETTIN THE WORKING DIRECTORY AND LOADING REQUIRED PACKAGES ##############
+########## SETTING THE WORKING DIRECTORY AND LOADING REQUIRED PACKAGES #############
 ####################################################################################
 
 # setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 # setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
-# 1. Load Required Packages
+# 1. Loading Required Packages
 
 # install.packages("RJOSONIO")  
 library(RJSONIO)
@@ -39,11 +39,11 @@ library(fmsb)
 library(car)
 
 ####################################################################################
-################################ LOADING WDI DATA ##################################
+########################## LOADING AND CLEANING WDI DATA ###########################
 ####################################################################################
 
 
-# 2. Load the default data for the years 2000-2012 from the Worldbank database
+# 2. Loading the default data for the years 2000-2012 from the Worldbank database
 wbdata <- c('NY.GDP.MKTP.KD', 'NY.GDP.PCAP.PP.KD', 'SI.POV.GAPS', 'SP.RUR.TOTL.ZS', 
             'EN.ATM.CO2E.PC', 'EG.ELC.ACCS.ZS', 'SH.XPD.TOTL.ZS', 'SH.H2O.SAFE.ZS', 
             'SH.STA.ACSN', 'SL.UEM.TOTL.ZS','SL.TLF.0714.WK.ZS', 'SE.PRM.ENRR', 'SH.XPD.PCAP', 
@@ -54,15 +54,15 @@ wbdata <- c('NY.GDP.MKTP.KD', 'NY.GDP.PCAP.PP.KD', 'SI.POV.GAPS', 'SP.RUR.TOTL.Z
 
 dataset <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE)
 
-### 3. Clean the data
+# 3. Cleaning the data
 
-## Look at dataset only and get rid of Regions
+## Droping regional data
 dataset <- dataset[dataset$region != "Aggregates", ]
 
-# Drop rows where all variables are missing
+# Droping rows where all variables are missing
 dataset2 <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
 
-# Visualise and count deleted values
+# Visualising and counting deleted values
 rows.in.a1.that.are.not.in.a2  <- function(dataset,dataset2)
 {
   dataset.vec <- apply(dataset, 1, paste, collapse = "")
@@ -74,14 +74,14 @@ AllNAs <- rows.in.a1.that.are.not.in.a2(dataset,dataset2)
 nrow(AllNAs)
 dataset <- dataset2
 
-# Drop rows where information on variable iso2c is missing
+# Droping rows where information on variable iso2c is missing
 dataset <- dataset[!is.na(dataset$iso2c),] ## No observations were dropped ###
 
-## Order the dataset and the years (ascending)
+## Ordering the dataset and the years (ascending)
 dataset <- group_by(dataset, iso2c)
 dataset <- arrange(dataset, iso2c, year)
 
-## Rename all the Variables with simple names
+## Renaming all the variables with simple names
 dataset <- plyr::rename(dataset, c("NY.GDP.MKTP.KD" = "GDP"))
 dataset <- plyr::rename(dataset, c("NY.GDP.PCAP.PP.KD" = "GDPpc"))
 dataset <- plyr::rename(dataset, c("SI.POV.GAPS" = "Poverty"))
@@ -143,70 +143,44 @@ sum(is.na(dataset$SmokeFem))
 sum(is.na(dataset$SmokeMale))
 sum(is.na(dataset$HospBeds))
 
-# Drop independent variables with more than 20% (552) NAs
+# Droping independent variables with more than 20% (552) NAs
 dataset <- dataset[, !(colnames(dataset) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","Births","HospBeds","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
 
-# Create a table with countries with a population smaller than one million
+# Creating a table with countries with a population smaller than one million
 SmallCountries <- dataset[ which(dataset$Population < 1000000) , ]
 
-# Drop small countries (population below one million)
+# Droping small countries (population below one million)
 dataset <- dataset[ which(dataset$Population > 1000000) , ]
 
-## Make sure the variables are already coded as numeric
+## Making sure the variables are already coded as numeric
 str(dataset) 
 summary(dataset)
 table (dataset$year)
 
-# Recode all 'factor variables'as numeric if possible
+# Recoding all 'factor variables'as numeric if possible
 dataset$longitude <- as.numeric(dataset$longitude)
 dataset$latitude <- as.numeric(dataset$latitude)
 
-# Set year as integer
+# Setting year as integer
 dataset$year <- as.integer(dataset$year)
 
-# Checking number of available observation per unique_identifier #
-dataset$GDPdummy <- as.numeric(!is.na(dataset$GDP))
-dataset$GDPpcdummy <- as.numeric(!is.na(dataset$GDPpc))
-dataset$Ruraldummy <- as.numeric(!is.na(dataset$Rural))
-dataset$CO2dummy <- as.numeric(!is.na(dataset$CO2))
-dataset$HCexpenddummy <- as.numeric(!is.na(dataset$HCexpend))
-dataset$Waterdummy <- as.numeric(!is.na(dataset$Water))
-dataset$Sanitationdummy <- as.numeric(!is.na(dataset$Sanitation))
-dataset$Unemploymdummy <- as.numeric(!is.na(dataset$Unemploym))
-dataset$Primarydummy <- as.numeric(!is.na(dataset$Primary))
-dataset$FemUnempldummy <- as.numeric(!is.na(dataset$FemUnempl))
-dataset$FemSchooldummy <- as.numeric(!is.na(dataset$FemSchool))
-dataset$LifeExpectdummy <- as.numeric(!is.na(dataset$LifeExpect))
-dataset$DPTdummy <- as.numeric(!is.na(dataset$DPT))
-dataset$Measlesdummy <- as.numeric(!is.na(dataset$Measles))
-
-dataset$DummySum <- dataset$GDPdummy + dataset$GDPpcdummy + dataset$Ruraldummy + dataset$CO2dummy + dataset$HCexpenddummy + dataset$Waterdummy + dataset$Sanitationdummy + dataset$Unemploymdummy + dataset$Primarydummy + dataset$FemUnempldummy + dataset$FemSchooldummy + dataset$LifeExpectdummy + dataset$DPTdummy + dataset$Measlesdummy
-
-table(dataset$DummySum)
-
-dataset[dataset$DummySum == '1',]
-dataset[dataset$DummySum == '2',]
-dataset[dataset$DummySum == '3',]
-dataset[dataset$DummySum == '4',]
-dataset[dataset$DummySum == '5',]
-dataset[dataset$DummySum == '6',]
 
 ####################################################################################
-################################ UNAIDS DATASET ####################################
+################# LOADING AND CLEANING UNAIDS DATASET ##############################
 ####################################################################################
 
-### 1. Downloading and preparing UNDAIDS data ###
+# 4. Downloading and preparing UNDAIDS data
 
 # The data is publicly available at 
 # 'http://www.google.de/url?sa=t&rct=j&q&esrc=s&source=web&cd=1&ved=0CCgQFjAA&url=http%3A%2F%2Fwww.unaids.org%2Fen%2Fmedia%2Funaids%2Fcontentassets%2Fdocuments%2Fdocument%2F2014%2F2014gapreportslides%2FHIV2013Estimates_1990-2013_22July2014.xlsx&ei=0I9XVJyZGoK6af6HAQ&usg=AFQjCNHEjs7Cc82jkTRwrRc8Jq4p2nKqbw&bvm=bv.78677474%2Cd.d2s' #
 # Save the Excel file in your working directory
 
-# Load the data into R                
+# Loading the data into R                
 HIV = loadWorkbook("HIV2013Estimates_1990-2013_22July2014.xlsx") 
 HIVcountry = readWorksheet(HIV, sheet="by region - country")
 HIVcountry <- HIVcountry[-c(1:5),-c(3:8,10:41)]
 
-## Rename all the Variables with simple names
+## Renaming all the variables with simple names
 HIVcountry <- plyr::rename(HIVcountry, c("HIV.estimates.with.uncertainty.bounds" = "Country"))
 HIVcountry <- plyr::rename(HIVcountry, c("Col2" = "year"))
 HIVcountry <- plyr::rename(HIVcountry, c("Col9" = "Incidence"))
@@ -223,12 +197,8 @@ HIVcountry$Incidence[HIVcountry$Incidence %in% c("<0.01")] <- 0.009
 ## Counting NAs
 sum(is.na(HIVcountry$Incidence)) 
 
-# Delete NAs
+# Deleting NAs
 HIVcountry <- HIVcountry[!is.na(HIVcountry$Incidence),]
-
-# Create a dummy variable for the logistic regression #
-HIVcountry$dummy <- as.numeric(HIVcountry$Incidence > 0.3764337)
-table(HIVcountry$dummy)
 
 ####################################################################################
 ################################ MERGE THE DATASETS ################################
