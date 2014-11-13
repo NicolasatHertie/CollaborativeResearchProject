@@ -1,11 +1,11 @@
 ####################################################################################
-################################ LOADING DATA #####################################
+########## SETTIN THE WORKING DIRECTORY AND LOADING REQUIRED PACKAGES ##############
 ####################################################################################
 
-setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
+# setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 # setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
-### 1. Load Required Packages
+# 1. Load Required Packages
 
 # install.packages("RJOSONIO")  
 library(RJSONIO)
@@ -38,8 +38,12 @@ library(fmsb)
 # install.packages ("car")
 library(car)
 
+####################################################################################
+################################ LOADING WDI DATA ##################################
+####################################################################################
 
-### 2. Load the default data for the years 2000-2012 from the Worldbank database
+
+# 2. Load the default data for the years 2000-2012 from the Worldbank database
 wbdata <- c('NY.GDP.MKTP.KD', 'NY.GDP.PCAP.PP.KD', 'SI.POV.GAPS', 'SP.RUR.TOTL.ZS', 
             'EN.ATM.CO2E.PC', 'EG.ELC.ACCS.ZS', 'SH.XPD.TOTL.ZS', 'SH.H2O.SAFE.ZS', 
             'SH.STA.ACSN', 'SL.UEM.TOTL.ZS','SL.TLF.0714.WK.ZS', 'SE.PRM.ENRR', 'SH.XPD.PCAP', 
@@ -56,73 +60,56 @@ dataset <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE
 dataset <- dataset[dataset$region != "Aggregates", ]
 
 # Drop rows where all variables are missing
-dataset <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
+dataset2 <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
+
+# Visualise and count deleted values
+rows.in.a1.that.are.not.in.a2  <- function(dataset,dataset2)
+{
+  dataset.vec <- apply(dataset, 1, paste, collapse = "")
+  dataset2.vec <- apply(dataset2, 1, paste, collapse = "")
+  a1.without.a2.rows <- dataset[!dataset.vec %in% dataset2.vec,]
+  return(a1.without.a2.rows)
+}
+AllNAs <- rows.in.a1.that.are.not.in.a2(dataset,dataset2)
+nrow(AllNAs)
+dataset <- dataset2
 
 # Drop rows where information on variable iso2c is missing
-dataset <- dataset[!is.na(dataset$iso2c),]
+dataset <- dataset[!is.na(dataset$iso2c),] ## No observations were dropped ###
 
 ## Order the dataset and the years (ascending)
 dataset <- group_by(dataset, iso2c)
 dataset <- arrange(dataset, iso2c, year)
 
 ## Rename all the Variables with simple names
-# GDP <- WDI(indicator = 'NY.GDP.MKTP.KD')
 dataset <- plyr::rename(dataset, c("NY.GDP.MKTP.KD" = "GDP"))
-# GDPpc <- WDI(indicator = 'NY.GDP.PCAP.PP.KD')
 dataset <- plyr::rename(dataset, c("NY.GDP.PCAP.PP.KD" = "GDPpc"))
-# Poverty <- WDI(indicator = 'SI.POV.GAPS')
 dataset <- plyr::rename(dataset, c("SI.POV.GAPS" = "Poverty"))
-# Rural <- WDI(indicator = 'SP.RUR.TOTL.ZS')
 dataset <- plyr::rename(dataset, c("SP.RUR.TOTL.ZS" = "Rural"))
-# CO2 <- WDI(indicator = 'EN.ATM.CO2E.PC')
 dataset <- plyr::rename(dataset, c("EN.ATM.CO2E.PC" = "CO2"))
-# Electr <- WDI(indicator = 'EG.ELC.ACCS.ZS')
 dataset <- plyr::rename(dataset, c("EG.ELC.ACCS.ZS" = "Electr"))
-# HCexpend <- WDI(indicator = 'SH.XPD.TOTL.ZS')
 dataset <- plyr::rename(dataset, c("SH.XPD.TOTL.ZS" = "HCexpend"))
-# HCexpendpc <- WDI(indicator = 'SH.XPD.PCAP')
 dataset <- plyr::rename(dataset, c("SH.XPD.PCAP" = "HCexpendpc"))
-# Births <- WDI(indicator = 'SH.MED.BEDS.ZS')
 dataset <- plyr::rename(dataset, c("SH.STA.BRTC.ZS" = "Births"))
-# HospBeds <- WDI(indicator = 'SH.MED.BEDS.ZS')
 dataset <- plyr::rename(dataset, c("SH.MED.BEDS.ZS" = "HospBeds"))
-# Water <- WDI(indicator = 'SH.H2O.SAFE.ZS')
 dataset <- plyr::rename(dataset, c("SH.H2O.SAFE.ZS" = "Water"))
-# Sanitation <- WDI(indicator = 'SH.STA.ACSN')
 dataset <- plyr::rename(dataset, c("SH.STA.ACSN" = "Sanitation"))
-# Unemploym <- WDI(indicator = 'SL.UEM.TOTL.ZS')
 dataset <- plyr::rename(dataset, c("SL.UEM.TOTL.ZS" = "Unemploym"))
-# Childempl <- WDI(indicator = 'SL.TLF.0714.WK.ZS')
 dataset <- plyr::rename(dataset, c("SL.TLF.0714.WK.ZS" = "Childempl"))
-# Primary <- WDI(indicator = 'SE.PRM.ENRR')
 dataset <- plyr::rename(dataset, c("SE.PRM.ENRR" = "Primary"))
-# FemUnempl <- WDI(indicator = 'SL.UEM.TOTL.FE.ZS')
 dataset <- plyr::rename(dataset, c("SL.UEM.TOTL.FE.ZS" = "FemUnempl"))
-# FemSchool <- WDI(indicator = 'SE.PRM.ENRR.FE')
 dataset <- plyr::rename(dataset, c("SE.PRM.ENRR.FE" = "FemSchool"))
-# FemHead <- WDI(indicator = 'SSP.HOU.FEMA.ZS')
 dataset <- plyr::rename(dataset, c("SP.HOU.FEMA.ZS" = "FemHead"))
-# LifeExpect <- WDI(indicator = 'SP.DYN.LE00.IN')
 dataset <- plyr::rename(dataset, c("SP.DYN.LE00.IN" = "LifeExpect"))
-# GINI <- WDI(indicator = 'SI.POV.GINI')
 dataset <- plyr::rename(dataset, c("SI.POV.GINI" = "GINI"))
-# CondFem <- WDI(indicator = 'SH.CON.1524.FE.ZS')
 dataset <- plyr::rename(dataset, c("SH.CON.1524.FE.ZS" = "CondFem"))
-# CondMale <- WDI(indicator = 'SH.CON.1524.MA.ZS')
 dataset <- plyr::rename(dataset, c("SH.CON.1524.MA.ZS" = "CondMale"))
-# Contraceptive <- WDI(indicator = 'SP.DYN.CONU.ZS')
 dataset <- plyr::rename(dataset, c("SP.DYN.CONU.ZS" = "Contraceptive"))
-# DPT <- WDI(indicator = 'SH.IMM.IDPT')
 dataset <- plyr::rename(dataset, c("SH.IMM.IDPT" = "DPT"))
-# Measles <- WDI(indicator = 'SH.IMM.MEAS')
 dataset <- plyr::rename(dataset, c("SH.IMM.MEAS" = "Measles"))
-# Overweight <- WDI(indicator = 'SH.STA.OWGH.ZS')
 dataset <- plyr::rename(dataset, c("SH.STA.OWGH.ZS" = "Overweight"))
-# SmokeFem <- WDI(indicator = 'SH.PRV.SMOK.FE')
 dataset <- plyr::rename(dataset, c("SH.PRV.SMOK.FE" = "SmokeFem"))
-# SmokeMale <- WDI(indicator = 'SH.PRV.SMOK.MA')
 dataset <- plyr::rename(dataset, c("SH.PRV.SMOK.MA" = "SmokeMale"))
-# Population <- WDI(indicator = 'SP.POP.TOTL')
 dataset <- plyr::rename(dataset, c("SP.POP.TOTL" = "Population"))
 
 
@@ -159,6 +146,9 @@ sum(is.na(dataset$HospBeds))
 # Drop independent variables with more than 20% (552) NAs
 dataset <- dataset[, !(colnames(dataset) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","Births","HospBeds","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
 
+# Create a table with countries with a population smaller than one million
+SmallCountries <- dataset[ which(dataset$Population < 1000000) , ]
+
 # Drop small countries (population below one million)
 dataset <- dataset[ which(dataset$Population > 1000000) , ]
 
@@ -168,12 +158,11 @@ summary(dataset)
 table (dataset$year)
 
 # Recode all 'factor variables'as numeric if possible
-dataset$capital <- as.numeric(dataset$capital)
 dataset$longitude <- as.numeric(dataset$longitude)
 dataset$latitude <- as.numeric(dataset$latitude)
-dataset$lending <- as.numeric(dataset$lending)
-dataset$income <- as.numeric(dataset$income)
 
+# Set year as integer
+dataset$year <- as.integer(dataset$year)
 
 # Checking number of available observation per unique_identifier #
 dataset$GDPdummy <- as.numeric(!is.na(dataset$GDP))
@@ -241,8 +230,6 @@ HIVcountry <- HIVcountry[!is.na(HIVcountry$Incidence),]
 HIVcountry$dummy <- as.numeric(HIVcountry$Incidence > 0.3764337)
 table(HIVcountry$dummy)
 
-
-
 ####################################################################################
 ################################ MERGE THE DATASETS ################################
 ####################################################################################
@@ -250,5 +237,27 @@ table(HIVcountry$dummy)
 Merged <- merge(dataset, HIVcountry,
                 by = c('iso2c','year'))
 summary(Merged)
+
+####################################################################################
+########################## CLEANING THE MERGED DATABASE ############################
+####################################################################################
+
+# Clean the database - remove unused columns
+Merged <- Merged[, !(colnames(Merged) %in% c("iso3c", "region","capital", "longitude", "latitude","income","lending","Country"))]
+
+####################################################################################
+################## PREPARE THE DATABASE FOR THE REGRESSION #########################
+####################################################################################
+
+# Lagging the dependent variable
+Merged <- slide(Merged, Var = "Incidence", GroupVar = "iso2c", slideBy = -1,
+                NewVar = "Incidence2")
+
+# Create a file with the difference between t0 and t1
+Merged$IncidenceDif <- as.numeric(Merged$Incidence) - as.numeric(Merged$Incidence2)
+
+# Create a dummy variable for countries with IndicenceDif>0
+Merged$DDif <- as.numeric(Merged$IncidenceDif>0)
+
 
 write.csv(Merged, file="MergedData")
