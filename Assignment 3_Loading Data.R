@@ -37,6 +37,8 @@ library(magrittr)
 library(fmsb)
 # install.packages ("car")
 library(car)
+# install.packages("DataCombine")
+library(DataCombine)
 
 ####################################################################################
 ########################## LOADING AND CLEANING WDI DATA ###########################
@@ -212,7 +214,7 @@ summary(Merged)
 ########################## CLEANING THE MERGED DATABASE ############################
 ####################################################################################
 
-# Clean the database - remove unused columns
+# Removing unused columns
 Merged <- Merged[, !(colnames(Merged) %in% c("iso3c", "region","capital", "longitude", "latitude","income","lending","Country"))]
 
 ####################################################################################
@@ -223,11 +225,11 @@ Merged <- Merged[, !(colnames(Merged) %in% c("iso3c", "region","capital", "longi
 Merged <- slide(Merged, Var = "Incidence", GroupVar = "iso2c", slideBy = -1,
                 NewVar = "Incidence2")
 
-# Create a file with the difference between t0 and t1
+# Creating a file with the difference between t0 and t1
 Merged$IncidenceDif <- as.numeric(Merged$Incidence) - as.numeric(Merged$Incidence2)
 
-# Create a dummy variable for countries with IndicenceDif>0
+# Creating a dummy variable for countries with IndicenceDif>0
 Merged$DDif <- as.numeric(Merged$IncidenceDif>0)
 
-
+# Creating a .csv file with the final version of the data
 write.csv(Merged, file="MergedData")
