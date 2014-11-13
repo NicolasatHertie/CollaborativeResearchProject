@@ -1,8 +1,6 @@
 ---
 title: "Collaborative Research Project - Assignment 3"
 bibliography:
-- Literature.bib
-- Packages.bib
 date: "24 October 2014"
 output: html_document
 number_sections: yes
@@ -104,6 +102,10 @@ When plotting the incidence rates per country (Figure 3) the countries with high
 
 ``` {r, echo=FALSE}
 # Look at incidence rate per country
+
+# Run source code to create scatter plot
+source("Analysis/ScatterUDS_Fert.R")
+
 IncC <- ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point(position = "jitter") + theme_bw()
 IncC + ggtitle("Figure 3: Incidence Rate per Country") + theme(plot.title = element_text(lineheight=3, face="bold"))
 
@@ -140,3 +142,11 @@ IncClag + ggtitle("Figure 6: Scatterplot of variables for living and working con
 scatterplotMatrix(~ Incidence + DPT + Measles, transform=TRUE, data=Merged)
 IncClag + ggtitle("Figure 7: Scatterplot of variables for individual lifestyle factors") + theme(plot.title = element_text(lineheight=3, face="bold"))
 ```
+
+Plot1 <- ggplot(MainData, aes(x = log(FertilizerConsumption), y = UDS)) +
+        geom_point(alpha = I(0.1)) +
+        stat_smooth(size = 2, method = "lm") +
+        ylab("Democracy Score\n") + xlab("\nLog Fertilizer Consumption") +
+        theme_bw(base_size = 15)
+
+print(Plot1)
