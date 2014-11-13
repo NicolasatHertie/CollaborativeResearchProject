@@ -23,13 +23,12 @@ b')
 
 # error=FALSE
 # Setting the Working Directory
-# setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
-setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
+setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
+# setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
 
 # Loading the merged file from the Working directory
 Merged <- read.csv(file="MergedData")
-NAdata <- read.csv(file="NAdata")
 ```
 
 ```{r, echo=FALSE, include=FALSE}
@@ -46,8 +45,8 @@ library(dplyr)
 library(tidyr)
 # install.packages("httr")  
 library(httr) 
-# install.packages("knitr")  
-library(knitr)
+# install.packages("dplyr")  
+library(dplyr)
 # install.packages("XML")  
 library(XML)
 #install.packages("plyr")
@@ -67,24 +66,7 @@ library(fmsb)
 # install.packages ("car")
 library(car)
 
-<<<<<<< HEAD
-
-```{r, echo=FALSE, include=FALSE}
-kable(NAdata)
-```
-
-
-
-```{r, echo=FALSE}
-
-####################################################################################
-################################ DESCRIPTIVE STATISTICS ############################
-####################################################################################
-
-# Not all variables are numeric yet
-=======
 ### 3. Check if Variables are coded as numeric
->>>>>>> FETCH_HEAD
 str(Merged)
 # Code variables as numeric
 Merged$Incidence <- as.numeric(Merged$Incidence)
@@ -97,7 +79,7 @@ Merged$Measles <- as.numeric(Merged$Measles)
 
 For the discriptive statistics scatterplots and histograms will be shown in order to understand the distribution of the variables.
 
-The histogram of the dependent variable shows that the incidence rates are not normally distributed but strongly skewed to the left and only few incidence rates are higher than 1. 
+The histogram of the dependent variable (Figure 1) shows that the incidence rates are not normally distributed but strongly skewed to the left and only few incidence rates are higher than 1. 
 
 ```{r, echo=FALSE}
 
@@ -107,4 +89,21 @@ The histogram of the dependent variable shows that the incidence rates are not n
 Histdep <- hist(Merged$Incidence, breaks= seq(0,5,by=0.1), xlab="HIV Incidence Rate", main="Figure 1: Incidence Rate")
 axis(side=1, at=seq(0,5, 0.5), labels=seq(0,5,0.5))
 axis(side=2, at=seq(0,800,100), labels=seq(0,800,100))
+```
+
+When plotting the incidence rates per country (Figure 2) the countries with high incidence rates can be identified and the ranges of the observations per country are shown.
+
+```{r, echo=FALSE}
+# Look at incidence rate per country
+ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
+```
+
+As our research question is investigating why MDG 6.A on reducing HIV prevalence is not being reached by some countries, the main variable of interest is not only the general HIV incidence rate but also the change in the incidence rate from 2000 to 2015. Therefore, we are 
+
+Reducing HIV prevalence is an important aim of the MDGs. Target 6.A of the MDGs specifies that countries should ???have halted by 2015 and begun to reverse the spread of HIV/AIDS??? (United Nations (2014)). In most regions of the world this goal has been fulfilled: new HIV infections declined and the overall number of new HIV/AIDS infections per 100 adults (15-49 years old) decreased by 44 per cent between 2001 and 2012 (United Nations (2014)). However, this trend cannot be observed in all 189 member states of the United Nations. On the contrary, HIV/AIDS prevalence has even increased in some countries.
+
+
+```{r, echo=FALSE}
+# Look at difference in incidence rate per country between one year to the next
+ggplot2::ggplot(Merged, aes(IncidenceDif, country)) + geom_point() + theme_bw()
 ```
