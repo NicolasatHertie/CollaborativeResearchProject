@@ -12,6 +12,7 @@ toc: yes
 ---
 
 
+<<<<<<< HEAD
 ```{r, echo=FALSE, include=FALSE}
 
 ### 1. Load Required Packages
@@ -48,14 +49,28 @@ library(fmsb)
 library(car)
 ```
 
+=======
+<<<<<<< HEAD
+
+```{r, echo=FALSE}
+
+source('Assignment 3_Loading Data')
+=======
+>>>>>>> FETCH_HEAD
 ```{r, echo=FALSE}
 # error=FALSE
 # Setting the Working Directory
 setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 # setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
+<<<<<<< HEAD
 # Loading the merged file from the Working directory
 Merged <- read.csv(file="MergedData")
+=======
+# Loading the data
+source('Assignment 3_Loading Data.Rmd')
+>>>>>>> FETCH_HEAD
+>>>>>>> FETCH_HEAD
 
 
 ####################################################################################
@@ -71,10 +86,63 @@ Merged$Measles <- as.numeric(Merged$Measles)
 
 ### 1. Plotting the dependent variable
 
+<<<<<<< HEAD
 # Histogram of dependent variable
 Histdep <- hist(Merged$Incidence, breaks= seq(0,5,by=0.1), xlab="HIV Incidence Rate")
 axis(side=1, at=seq(0,5, 0.5), labels=seq(0,5,0.5))
 axis(side=2, at=seq(0,800,100), labels=seq(0,800,100))
+=======
+# Histogram of dependent variable - smaller Intervals???
+axis(1,at=c(0,0.5,1,1.5))
+hist(Merged$Incidence, xlab="HIV Incidence Rate", xlim=c(0, 4))
+
+
+# Look at incidence rate per country
+<<<<<<< HEAD
+ggplot2::ggplot(Merged, aes((Difference), country)) + geom_point() + theme_bw()
+
+# Look at incidence over time - seee the general trend
+#plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
+=======
+ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
+
+# Look at incidence over time - seee the general trend
+plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
+>>>>>>> FETCH_HEAD
+#plot_IncTime + theme(axis.title.x = element_blank()) + ylab("Weight (Kg)")
+
+#library(scales)   # Need the scales package
+#bp + scale_y_continuous(labels=percent) +
+     #scale_x_discrete(labels=abbreviate)  # In this particular case, it has no effect
+convert it to integer
+
+# Also possible to set the axis label with the scale
+# Note that vertical space is still reserved for x's label
+bp + scale_x_discrete(name="") +
+     scale_y_continuous(name="Weight (Kg)")
+       
+# Look at the relation between Incidence and Health Care Spending per capita (+ geom_smooth() for fitting a line)
+ggplot2::ggplot(Merged, aes(Incidence, HCexpendpc)) + geom_point() + theme_bw()
+ggplot2::ggplot(Merged, aes(Incidence, HCexpend)) + geom_point() + theme_bw()
+
+
+### 2. Plotting the independent variables
+
+# Scatterplot of general socio-economic, cultural and environmental conditions
+scatterplotMatrix(~ Incidence + + GDP + GDPpc + Rural + CO2 + LifeExpect + Population, 
+                  transform=TRUE, data=Merged)
+
+
+# Scatterplot of living and working conditions 
+scatterplotMatrix(~ Incidence + Water + Sanitation + Primary + Unemploym + HCexpendpc,
+                  transform=TRUE, data=Merged)
+
+
+
+# Scatterplot of individual lifestyle factors
+scatterplotMatrix(~ Incidence + DPT + Measles, transform=TRUE, data=Merged)
+# calculate VIF!!!
+>>>>>>> FETCH_HEAD
 
 # function (quantiles)
 # summary on data file
@@ -101,4 +169,5 @@ plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,
 #plot_IncTime + theme(axis.title.x = element_blank()) + ylab("Weight (Kg)")
 ```
 
-
+levels(factor(Merged$iso2c))
+aggregate(Merged$iso2c, by=list(Merged$iso2c), FUN=mean)[2]

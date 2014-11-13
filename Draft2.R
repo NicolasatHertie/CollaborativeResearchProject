@@ -1,4 +1,4 @@
-# setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
+setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
 # setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
 ### 1. Load Required Packages
@@ -25,6 +25,13 @@ library(Amelia)
 library(XLConnect)    
 # install.packages("countrycode")
 library("countrycode")
+# install.packages ("ggplot2")
+library(ggplot2)
+# # install.packages ("magrittr") ???
+library(magrittr)
+# install.packages ("fmsb")
+library(fmsb)
+
 
 ### 2. Load the default data for the years 2000-2012 from the Worldbank database
 wbdata <- c('NY.GDP.MKTP.KD', 'NY.GDP.PCAP.PP.KD', 'SI.POV.GAPS', 'SP.RUR.TOTL.ZS', 
@@ -43,25 +50,10 @@ dataset <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE
 dataset <- dataset[dataset$region != "Aggregates", ]
 
 # Drop rows where all variables are missing
-dataset2 <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
-
-# Visualise and count deleted values
-rows.in.a1.that.are.not.in.a2  <- function(dataset,dataset2)
-{
-  dataset.vec <- apply(dataset, 1, paste, collapse = "")
-  dataset2.vec <- apply(dataset2, 1, paste, collapse = "")
-  a1.without.a2.rows <- dataset[!dataset.vec %in% dataset2.vec,]
-  return(a1.without.a2.rows)
-}
-AllNAs <- rows.in.a1.that.are.not.in.a2(dataset,dataset2)
-nrow(AllNAs)
-
-dataset <- dataset2
+dataset <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
 
 # Drop rows where information on variable iso2c is missing
-dataset2 <- dataset[!is.na(dataset$iso2c),]
-## No observations were dropped ###
-dataset <- dataset2
+dataset <- dataset[!is.na(dataset$iso2c),]
 
 ## Order the dataset and the years (ascending)
 dataset <- group_by(dataset, iso2c)
@@ -161,9 +153,6 @@ sum(is.na(dataset$HospBeds))
 # Drop independent variables with more than 20% (552) NAs
 dataset <- dataset[, !(colnames(dataset) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","Births","HospBeds","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
 
-# Create a table with countries with a population smaller than one million
-SmallCountries <- dataset[ which(dataset$Population < 1000000) , ]
-
 # Drop small countries (population below one million)
 dataset <- dataset[ which(dataset$Population > 1000000) , ]
 
@@ -179,8 +168,6 @@ dataset$latitude <- as.numeric(dataset$latitude)
 dataset$lending <- as.numeric(dataset$lending)
 dataset$income <- as.numeric(dataset$income)
 
-# Set year as integer
-dataset$income <- as.integer(dataset$year)
 
 # Checking number of available observation per unique_identifier #
 dataset$GDPdummy <- as.numeric(!is.na(dataset$GDP))
@@ -258,9 +245,75 @@ Merged <- merge(dataset, HIVcountry,
                 by = c('iso2c','year'))
 summary(Merged)
 
+
 ####################################################################################
-################################ RUN THE REGRESSIONS ###############################
+################################ DESCRIPTIVE STATISTICS ############################
 ####################################################################################
+
+# what is iso3c???
+# Not all variables are numeric yet
+str(Merged)
+# code dependet variable as numeric
+Merged$Incidence <- as.numeric(Merged$Incidence)
+
+### 1. Plotting the dependent variable
+
+# Histogram of dependent variable - smaller Intervals???
+hist(Merged$Incidence, xlab="HIV Incidence Rate")
+hist(log(Merged$Incidence), xlab="HIV Incidence Rate")
+
+# Look at incidence rate per country
+ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
+
+# Look at incidence over time - seee the general trend
+ggplot(aes(x = year, y = Incidence), data = Merged) + geom_point() + theme_bw() + geom_smooth()
+
+# Look at the relation between Incidence and Health Care Spending per capita (+ geom_smooth() for fitting a line)
+ggplot2::ggplot(Merged, aes(Incidence, HCexpendpc)) + geom_point() + theme_bw()
+ggplot2::ggplot(Merged, aes(Incidence, HCexpend)) + geom_point() + theme_bw()
+
+
+### 2. Plotting the independent variables
+
+# Scatterplot of general socio-economic, cultural and environmental conditions
+scatterplotMatrix(~ Incidence + + GDP + GDPpc + Rural + CO2 + LifeExpect + Population, 
+                  transform=TRUE, data=Merged)
+# drop GDP & Healthcare spending???
+
+# Scatterplot of individual lifestyle factors???
+scatterplotMatrix(~ Incidence + DPT + Measles, transform=TRUE, data=Merged)
+# calculate VIF!!!
+
+# Scatterplot of social and community networks???
+scatterplotMatrix(~ FemUnempl + FemSchool, transform=TRUE, data=Merged)
+# calculate VIF!!!
+
+# Scatterplot of living and working conditions 
+scatterplotMatrix(~ Incidence + Water + Sanitation + Primary + Unemploym + HCexpendpc,
+                  transform=TRUE, data=Merged)
+
+
+####################################################################################
+################################ INFERENTIAL STATISTICS ###############################
+####################################################################################
+
+### Logging most of the independent variables for better comparability
+Merged$lGDP <- log(Merged$GDP)
+Merged$lGDPpc <- log(Merged$GDPpc)
+Merged$lRural <- log(Merged$Rural)
+Merged$lCO2 <- log(Merged$CO2)
+Merged$lHCexpend <- log(Merged$HCexpend)
+Merged$lWater <- log(Merged$Water)
+Merged$lSanitation <- log(Merged$Sanitation)
+Merged$lUnemploym <- log(Merged$Unemploym)
+Merged$lPrimary <- log(Merged$Primary)
+Merged$lHCexpendpc <- log(Merged$HCexpendpc)
+Merged$lFemUnempl <- log(Merged$FemUnempl)
+Merged$lFemSchool <- log(Merged$FemSchool)
+Merged$lLifeExpect <- log(Merged$LifeExpect)
+Merged$lDPT <- log(Merged$DPT)
+Merged$lMeasles <- log(Merged$Measles)
+
 
 R2 <- lm(Incidence ~ GDP +  Rural, data = Merged)
 summary(R2)
@@ -268,33 +321,62 @@ summary(R2)
 R3 <- lm(Incidence ~ HCexpend, data = Merged)
 summary(R3)
 
-summary(R2,R3)
+# Model 1: Logistic Regression of all Variables without Cotrols
+M1 <- lm(Incidence ~ lGDP + lRural + lCO2 + lHCexpend + lLifeExpect + lWater + lSanitation + lPrimary + lUnemploym + lDPT + lMeasles,
+         data=Merged)
+summary(M1)
+confint(M1)
+plot(M1, which = 1)
 
-fitted <- with(Merged)
 
-# whats missing #
+# Multicollinearity
+VIF(M1)
+vif_func(M1)
 
-install.packages("plm")
-library(plm)
+# Evaluate Collinearity
+vif(M1) # variance inflation factors
 
-xtset(HIVcountry = NULL,
-      data = c("year"),
-      spec = "iso2c")
+Immu <- lm(Incidence ~ lDPT + lMeasles,
+           data=Merged)
+vif(Immu) # variance inflation factors
 
-HIVcountryg <- pdata.frame(HIVcountry, index = c("iso2c", "year"), drop.index = FALSE, row.names = TRUE)
-HIVcountryg <- group_by(HIVcountryg, iso2c)
-HIVcountryg <- arrange(HIVcountryg, year)
-install.packages("DataCombine")
-library(DataCombine)
 
-??xtset
-ts=year cs=iso2c
-HIVcountry <- group_by(HIVcountry,iso2c)
-HIVcountry <- ungroup(HIVcountry)
-HIVcountryg$Incidence1 <- embed(HIVcountryg$Incidence,2)
-HIVcountryg$Incidence2 <- head(lag(HIVcountryg$Incidence, 1))
-HIVIn <- HIVcountry$Incidence
-Merged <- slide(Merged, Var = "Incidence", GroupVar = "iso2c", slideBy = -1,
-                          NewVar = "Incidence2")
-all.x = TRUE
-HIVIn <- HIVcountry[, !(colnames(HIVcountry) %in% c("dummy"))]
+GDP <- lm(Incidence ~ lGDPpc + lRural + lCO2 + lHCexpend + lLifeExpect + lWater + lSanitation + lPrimary + lUnemploym + lDPT + lMeasles,
+          data=Merged)
+
+
+vif(GDP) # variance inflation factors
+
+
+
+?VIF
+
+# Model 2: Logistic Regression of all Variables Model cotrolling for country, population and year effects
+M2 <- lm(Incidence ~ GDPpc + Rural + CO2 + HCexpendpc + LifeExpect + Population + Water + Sanitation + Primary + Unemploym + FemUnempl + FemSchool + DPT + Measles + Population + iso2c + year,
+         data=Merged)
+summary(M2)
+confint(M2)
+plot(M2, which = 1)
+
+## Logistic Regression
+
+Logit1 <- glm(dummy ~ lGDP + lRural + lCO2 + lHCexpend + lLifeExpect + lWater + lSanitation + lPrimary + lUnemploym + lDPT + lMeasles,
+              data=Merged, family = 'binomial')
+summary(Logit1)
+confint(Logit1)
+
+mean(Merged$lGDP, na.rm=TRUE)
+
+fitted_L1 <- with(Merged,
+                  data.frame(mean_GDP = mean(log(GDP), na.rm=TRUE),
+                             mean_Rural = mean(log(Rural), na.rm=TRUE),
+                             mean_CO2 = mean(log(CO2), na.rm=TRUE),
+                             mean_HCexpend = mean(log(HCexpend), na.rm=TRUE),
+                             mean_LifeExpect = mean(log(LifeExpect), na.rm=TRUE),
+                             mean_Water = mean(log(Water), na.rm=TRUE),
+                             mean_Sanitation = mean(log(Sanitation), na.rm=TRUE),
+                             mean_Primary = mean(log(Primary), na.rm=TRUE),
+                             mean_Unemploym = mean(log(Unemploym), na.rm=TRUE),
+                             DPT = log(DPT)))
+fitted_L1
+
