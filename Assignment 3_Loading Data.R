@@ -17,8 +17,8 @@ library(dplyr)
 library(tidyr)
 # install.packages("httr")  
 library(httr) 
-# install.packages("dplyr")  
-library(dplyr)
+# install.packages("knitr")  
+library(knitr)
 # install.packages("XML")  
 library(XML)
 #install.packages("plyr")
@@ -58,10 +58,10 @@ dataset <- WDI(country='all', indicator=wbdata, start=2000, end=2012, extra=TRUE
 
 # 3. Cleaning the data
 
-## Droping regional data
+## Dropping regional data
 dataset <- dataset[dataset$region != "Aggregates", ]
 
-# Droping rows where all variables are missing
+# Dropping rows where all variables are missing
 dataset2 <- dataset[which(rowSums(!is.na(dataset[, wbdata])) > 0), ]
 
 # Visualising and counting deleted values
@@ -76,7 +76,7 @@ AllNAs <- rows.in.a1.that.are.not.in.a2(dataset,dataset2)
 nrow(AllNAs)
 dataset <- dataset2
 
-# Droping rows where information on variable iso2c is missing
+# Dropping rows where information on variable iso2c is missing
 dataset <- dataset[!is.na(dataset$iso2c),] ## No observations were dropped ###
 
 ## Ordering the dataset and the years (ascending)
@@ -114,44 +114,53 @@ dataset <- plyr::rename(dataset, c("SH.PRV.SMOK.FE" = "SmokeFem"))
 dataset <- plyr::rename(dataset, c("SH.PRV.SMOK.MA" = "SmokeMale"))
 dataset <- plyr::rename(dataset, c("SP.POP.TOTL" = "Population"))
 
-
 ## Counting NAs in the independent variables
-sum(is.na(dataset$GDP))
-sum(is.na(dataset$GDPpc))
-sum(is.na(dataset$Poverty))
-sum(is.na(dataset$Rural))
-sum(is.na(dataset$CO2))
-sum(is.na(dataset$Electr))
-sum(is.na(dataset$HCexpend))
-sum(is.na(dataset$HCexpendpc))
-sum(is.na(dataset$Births))
-sum(is.na(dataset$Water))
-sum(is.na(dataset$Sanitation))
-sum(is.na(dataset$Unemploym))
-sum(is.na(dataset$Childempl))
-sum(is.na(dataset$Primary))
-sum(is.na(dataset$FemUnempl))
-sum(is.na(dataset$FemSchool))
-sum(is.na(dataset$FemHead))
-sum(is.na(dataset$LifeExpect))
-sum(is.na(dataset$GINI))
-sum(is.na(dataset$CondFem))
-sum(is.na(dataset$CondMale))
-sum(is.na(dataset$Contraceptive))
-sum(is.na(dataset$DPT))
-sum(is.na(dataset$Measles))
-sum(is.na(dataset$Overweight))
-sum(is.na(dataset$SmokeFem))
-sum(is.na(dataset$SmokeMale))
-sum(is.na(dataset$HospBeds))
+AllNAs$GDPsum <- sum(is.na(dataset$GDP))/nrow(dataset)
+AllNAs$GDPpcsum <- sum(is.na(dataset$GDPpc))/nrow(dataset)
+AllNAs$Povertysum <- sum(is.na(dataset$Poverty))/nrow(dataset)
+AllNAs$Ruralsum <- sum(is.na(dataset$Rural))/nrow(dataset)
+AllNAs$CO2sum <- sum(is.na(dataset$CO2))/nrow(dataset)
+AllNAs$Electrsum <- sum(is.na(dataset$Electr))/nrow(dataset)
+AllNAs$HCexpendsum <- sum(is.na(dataset$HCexpend))/nrow(dataset)
+AllNAs$HCexpendpcsum <- sum(is.na(dataset$HCexpendpc))/nrow(dataset)
+AllNAs$Birthssum <- sum(is.na(dataset$Births))/nrow(dataset)
+AllNAs$Watersum <- sum(is.na(dataset$Water))/nrow(dataset)
+AllNAs$Sanitationsum <- sum(is.na(dataset$Sanitation))/nrow(dataset)
+AllNAs$Unemploymsum <- sum(is.na(dataset$Unemploym))/nrow(dataset)
+AllNAs$Childemplsum <- sum(is.na(dataset$Childempl))/nrow(dataset)
+AllNAs$Primarysum <- sum(is.na(dataset$Primary))/nrow(dataset)
+AllNAs$FemUnemplsum <- sum(is.na(dataset$FemUnempl))/nrow(dataset)
+AllNAs$FemSchoolsum <- sum(is.na(dataset$FemSchool))/nrow(dataset)
+AllNAs$FemHeadsum <- sum(is.na(dataset$FemHead))/nrow(dataset)
+AllNAs$LifeExpectsum <- sum(is.na(dataset$LifeExpect))/nrow(dataset)
+AllNAs$GINIsum <- sum(is.na(dataset$GINI))/nrow(dataset)
+AllNAs$CondFemPsum <- sum(is.na(dataset$CondFem))/nrow(dataset)
+AllNAs$CondMalesum <- sum(is.na(dataset$CondMale))/nrow(dataset)
+AllNAs$Contraceptivesum <- sum(is.na(dataset$Contraceptive))/nrow(dataset)
+AllNAs$DPTsum <- sum(is.na(dataset$DPT))/nrow(dataset)
+AllNAs$Measlessum <- sum(is.na(dataset$Measles))/nrow(dataset)
+AllNAs$Overweightsum <- sum(is.na(dataset$Overweight))/nrow(dataset)
+AllNAs$SmokeFemsum <- sum(is.na(dataset$SmokeFem))/nrow(dataset)
+AllNAs$SmokeMalesum <- sum(is.na(dataset$SmokeMale))/nrow(dataset)
+AllNAs$HospBedssum <- sum(is.na(dataset$HospBeds))/nrow(dataset)
 
-# Droping independent variables with more than 20% (552) NAs
+# Preparing a table to show the number of NAs per independent variable
+AllNAs <- AllNAs[,-c(1:39)]
+AllNAs <- AllNAs[!duplicated(AllNAs), ]
+TAllNAs <- t(AllNAs)
+kable(TAllNAs)
+
+
+# Dropping independent variables with more than 20% (552) NAs
 dataset <- dataset[, !(colnames(dataset) %in% c("Poverty", "Electr","FemHead", "Childempl", "GINI","Births","HospBeds","CondFem","CondMale", "Contraceptive", "Overweight", "SmokeFem", "SmokeMale"))]
 
 # Creating a table with countries with a population smaller than one million
 SmallCountries <- dataset[ which(dataset$Population < 1000000) , ]
+SmallCountries <- SmallCountries[!duplicated(SmallCountries$country), ]
+SmallCountries <- SmallCountries[,-c(1,3:25)]
+kable(SmallCountries$country, format = "latex")
 
-# Droping small countries (population below one million)
+# Dropping small countries (population below one million)
 dataset <- dataset[ which(dataset$Population > 1000000) , ]
 
 ## Making sure the variables are already coded as numeric
@@ -180,9 +189,11 @@ dataset$year <- as.integer(dataset$year)
 # Loading the data into R                
 HIV = loadWorkbook("HIV2013Estimates_1990-2013_22July2014.xlsx") 
 HIVcountry = readWorksheet(HIV, sheet="by region - country")
+
+# Removing unnecessary columns  
 HIVcountry <- HIVcountry[-c(1:5),-c(3:8,10:41)]
 
-## Renaming all the variables with simple names
+# Renaming all the variables with simple names
 HIVcountry <- plyr::rename(HIVcountry, c("HIV.estimates.with.uncertainty.bounds" = "Country"))
 HIVcountry <- plyr::rename(HIVcountry, c("Col2" = "year"))
 HIVcountry <- plyr::rename(HIVcountry, c("Col9" = "Incidence"))
@@ -196,7 +207,7 @@ HIVcountry$Incidence[HIVcountry$Incidence %in% c("...")] <- NA
 # Recoding "<0.01" as 0.009 
 HIVcountry$Incidence[HIVcountry$Incidence %in% c("<0.01")] <- 0.009
 
-## Counting NAs
+# Counting NAs
 sum(is.na(HIVcountry$Incidence)) 
 
 # Deleting NAs
@@ -206,6 +217,8 @@ HIVcountry <- HIVcountry[!is.na(HIVcountry$Incidence),]
 ################################ MERGE THE DATASETS ################################
 ####################################################################################
 
+# 5. Merging "dataset" and "HIVcountry"
+
 Merged <- merge(dataset, HIVcountry,
                 by = c('iso2c','year'))
 summary(Merged)
@@ -214,12 +227,16 @@ summary(Merged)
 ########################## CLEANING THE MERGED DATABASE ############################
 ####################################################################################
 
+# 6. Cleaning the new database
+
 # Removing unused columns
 Merged <- Merged[, !(colnames(Merged) %in% c("iso3c", "region","capital", "longitude", "latitude","income","lending","Country"))]
 
 ####################################################################################
 ################## PREPARE THE DATABASE FOR THE REGRESSION #########################
 ####################################################################################
+
+# 7. Creating the variables required to perform the regressions
 
 # Lagging the dependent variable
 Merged <- slide(Merged, Var = "Incidence", GroupVar = "iso2c", slideBy = -1,
@@ -231,5 +248,19 @@ Merged$IncidenceDif <- as.numeric(Merged$Incidence) - as.numeric(Merged$Incidenc
 # Creating a dummy variable for countries with IndicenceDif>0
 Merged$DDif <- as.numeric(Merged$IncidenceDif>0)
 
+# 8. Creating .csv to speed up the loading of the data
+
 # Creating a .csv file with the final version of the data
 write.csv(Merged, file="MergedData")
+
+# Creating a .csv file with the NA data 
+write.csv(TAllNAs, file="NAdata")
+
+# Creating a .csv file with deleted countries  
+write.csv(SmallCountries, file="SmallCountries")
+
+# TO CHECK WHICH COUNTRIES ARE DROPPED WHEN MERGING THE DATASETS
+datasetR <- dataset[!duplicated(dataset$country), ]
+HIVcountryR <- HIVcountry[!duplicated(HIVcountry$Country), ]
+MergedR <- Merged[!duplicated(Merged$country), ]
+

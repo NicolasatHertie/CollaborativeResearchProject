@@ -22,12 +22,13 @@ b')
 
 # error=FALSE
 # Setting the Working Directory
-setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
-# setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
+# setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
+setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
 
 
 # Loading the merged file from the Working directory
 Merged <- read.csv(file="MergedData")
+NAdata <- read.csv(file="NAdata")
 ```
 
 ```{r, echo=FALSE, include=FALSE}
@@ -44,8 +45,8 @@ library(dplyr)
 library(tidyr)
 # install.packages("httr")  
 library(httr) 
-# install.packages("dplyr")  
-library(dplyr)
+# install.packages("knitr")  
+library(knitr)
 # install.packages("XML")  
 library(XML)
 #install.packages("plyr")
@@ -65,6 +66,12 @@ library(fmsb)
 # install.packages ("car")
 library(car)
 ```
+
+
+```{r, echo=FALSE, include=FALSE}
+kable(NAdata)
+```
+
 
 
 ```{r, echo=FALSE}
