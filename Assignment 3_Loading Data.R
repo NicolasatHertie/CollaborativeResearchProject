@@ -39,6 +39,8 @@ library(fmsb)
 library(car)
 # install.packages("DataCombine")
 library(DataCombine)
+# install.packages("lmtest")
+library(lmtest)
 
 ####################################################################################
 ########################## LOADING AND CLEANING WDI DATA ###########################
@@ -213,6 +215,13 @@ sum(is.na(HIVcountry$Incidence))
 # Deleting NAs
 HIVcountry <- HIVcountry[!is.na(HIVcountry$Incidence),]
 
+# Deleting the regions with iso2c=NA except Namibia
+HIVcountry <- subset(HIVcountry,!(iso2c=="NA" & Country!="Namibia"))
+
+# Deleting the regions with iso2c=ZA except South Africa
+HIVcountry <- subset(HIVcountry,!(iso2c=="ZA" & Country!="South Africa"))
+
+
 ####################################################################################
 ################################ MERGE THE DATASETS ################################
 ####################################################################################
@@ -264,3 +273,64 @@ datasetR <- dataset[!duplicated(dataset$country), ]
 HIVcountryR <- HIVcountry[!duplicated(HIVcountry$Country), ]
 MergedR <- Merged[!duplicated(Merged$country), ]
 
+####################################################################################
+########################### INFERENTIAL STATISTICS #################################
+####################################################################################
+
+# Logging the independent variables for better comparability
+Merged$lGDP <- log(Merged$GDP)
+Merged$lGDPpc <- log(Merged$GDPpc)
+Merged$lRural <- log(Merged$Rural)
+Merged$lCO2 <- log(Merged$CO2)
+Merged$lHCexpend <- log(Merged$HCexpend)
+Merged$lWater <- log(Merged$Water)
+Merged$lSanitation <- log(Merged$Sanitation)
+Merged$lUnemploym <- log(Merged$Unemploym)
+Merged$lPrimary <- log(Merged$Primary)
+Merged$lHCexpendpc <- log(Merged$HCexpendpc)
+Merged$lFemUnempl <- log(Merged$FemUnempl)
+Merged$lFemSchool <- log(Merged$FemSchool)
+Merged$lLifeExpect <- log(Merged$LifeExpect)
+Merged$lDPT <- log(Merged$DPT)
+Merged$lMeasles <- log(Merged$Measles)
+
+# Running the logistic regression
+
+L1 <- glm(DDif ~ lGDP + lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lUnemploym + lPrimary + lHCexpendpc + lFemUnempl + lFemSchool + lLifeExpect + lDPT + lMeasles,
+          data=Merged, family = 'binomial')
+summary(L1)
+
+# Testing for multicollinearity
+vif(L1)
+
+# Running the regression without multicollinear variables
+L2 <- glm(DDif ~ lGDP + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl + lFemSchool + lLifeExpect + lDPT + lMeasles,
+          data=Merged, family = 'binomial')
+summary(L2)
+
+
+L3 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl + lFemSchool + lLifeExpect + lDPT + lMeasles,
+          data=Merged, family = 'binomial')
+summary(L3)
+
+# Testing for multicollinearity
+vif(L2)
+vif(L3)
+
+# Looking at confidence intervals
+confint(L3)
+
+# Testing for multicollinearity
+bptest(L3)
+coeftest(L3,vcov=hccm(L3))
+
+# Including an interaction term
+L4 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl * lFemSchool + lLifeExpect + lDPT + lMeasles,
+          data=Merged, family = 'binomial')
+summary(L4)
+plot(L4)
+
+# Using the anova function to evaluate the effect on the deviance of adding the interaction term 
+anova(L3,L4)
+
+anova(L4,test="Chisq")
