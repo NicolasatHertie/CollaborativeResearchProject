@@ -95,9 +95,22 @@ ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
 ggplot2::ggplot(Merged, aes(IncidenceDif, country)) + geom_point() + theme_bw()
 
 # Look at incidence over time - seee the general trend
-ggplot(aes(x = year, y = Incidence), data = Merged) + geom_point() + theme_bw() + geom_smooth()
+p <- ggplot(aes(x = year, y = Incidence), data = Merged) + geom_point() + theme_bw() + geom_smooth()
+options(digits=0)
+p
 
-ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
+round()
+
+p + xlim=c(2000,2012)
+
+m <- qplot(year, Incidence, data=Merged, na.rm = TRUE)
+m + scale_x_continuous(labels = comma)
+
+
+
+m + scale_x_continuous(breaks=c(2000,2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,2012), labels=c("two", "five", "eight"))
+
+ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5)) + geom_point() + theme_bw() + geom_smooth()
 
 tryplot <- ggplot(Merged, aes(year, Incidence)) + geom_line() + geom_point() + scale_y_continuous(limits=c(0,5),breaks=seq(0,5,0.5),labels=seq(0,5,0.5)) + scale_x_discrete()
 
@@ -105,7 +118,7 @@ tryplot <- ggplot(Merged, aes(year, Incidence)) + geom_line() + geom_point() + s
 tryplot <- ggplot(Merged, aes(year, Incidence)) + geom_line() + geom_point() + scale_y_continuous(limits=c(0,5),breaks=seq(0,5,0.5),labels=seq(0,5,0.5)) + scale_x_discrete(limits=c(2000,2012), breaks=seq(2000,2012,1),labels=seq(2000,2012,1))
 
 
-tryplot                     
+tryplot
                      
 ?ggplot
 
