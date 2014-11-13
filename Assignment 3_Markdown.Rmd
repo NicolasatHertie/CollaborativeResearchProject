@@ -12,10 +12,27 @@ toc: yes
 ---
 
 
-<<<<<<< HEAD
+repmis::LoadandCite(pkgs, file = 'RpackageCitations.bi
+Note: Use a file name that is different from your literature BibTeX file!
+b')
+
 ```{r, echo=FALSE, include=FALSE}
 
-### 1. Load Required Packages
+### 1. Setting Working Directory & Loading the data
+
+# error=FALSE
+# Setting the Working Directory
+setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
+# setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
+
+
+# Loading the merged file from the Working directory
+Merged <- read.csv(file="MergedData")
+```
+
+```{r, echo=FALSE, include=FALSE}
+
+### 2. Load Required Packages
 
 # install.packages("RJOSONIO")  
 library(RJSONIO)
@@ -49,29 +66,8 @@ library(fmsb)
 library(car)
 ```
 
-=======
-<<<<<<< HEAD
 
 ```{r, echo=FALSE}
-
-source('Assignment 3_Loading Data')
-=======
->>>>>>> FETCH_HEAD
-```{r, echo=FALSE}
-# error=FALSE
-# Setting the Working Directory
-setwd("/Users/Meilin/Desktop/Collaborative Social Data/CollaborativeResearchProject")
-# setwd("/Users/Nico/Documents/Hertie/Social science data analysis/CollaborativeResearchProject")
-
-<<<<<<< HEAD
-# Loading the merged file from the Working directory
-Merged <- read.csv(file="MergedData")
-=======
-# Loading the data
-source('Assignment 3_Loading Data.Rmd')
->>>>>>> FETCH_HEAD
->>>>>>> FETCH_HEAD
-
 
 ####################################################################################
 ################################ DESCRIPTIVE STATISTICS ############################
@@ -79,36 +75,59 @@ source('Assignment 3_Loading Data.Rmd')
 
 # Not all variables are numeric yet
 str(Merged)
-# code some variable as numeric
+# Code variables as numeric
 Merged$Incidence <- as.numeric(Merged$Incidence)
 Merged$DPT <- as.numeric(Merged$DPT)
 Merged$Measles <- as.numeric(Merged$Measles)
 
 ### 1. Plotting the dependent variable
 
-<<<<<<< HEAD
 # Histogram of dependent variable
 Histdep <- hist(Merged$Incidence, breaks= seq(0,5,by=0.1), xlab="HIV Incidence Rate")
 axis(side=1, at=seq(0,5, 0.5), labels=seq(0,5,0.5))
 axis(side=2, at=seq(0,800,100), labels=seq(0,800,100))
-=======
-# Histogram of dependent variable - smaller Intervals???
-axis(1,at=c(0,0.5,1,1.5))
-hist(Merged$Incidence, xlab="HIV Incidence Rate", xlim=c(0, 4))
-
 
 # Look at incidence rate per country
-<<<<<<< HEAD
-ggplot2::ggplot(Merged, aes((Difference), country)) + geom_point() + theme_bw()
-
-# Look at incidence over time - seee the general trend
-#plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
-=======
 ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
 
+
+# Look at difference in incidence rate per country between one year to the next
+ggplot2::ggplot(Merged, aes(IncidenceDif, country)) + geom_point() + theme_bw()
+
 # Look at incidence over time - seee the general trend
-plot_IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
->>>>>>> FETCH_HEAD
+ggplot(aes(x = year, y = Incidence), data = Merged) + geom_point() + theme_bw() + geom_smooth()
+
+ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw() + geom_smooth())
+
+tryplot <- ggplot(Merged, aes(year, Incidence)) + geom_line() + geom_point() + scale_y_continuous(limits=c(0,5),breaks=seq(0,5,0.5),labels=seq(0,5,0.5)) + scale_x_discrete()
+
+
+tryplot <- ggplot(Merged, aes(year, Incidence)) + geom_line() + geom_point() + scale_y_continuous(limits=c(0,5),breaks=seq(0,5,0.5),labels=seq(0,5,0.5)) + scale_x_discrete(limits=c(2000,2012), breaks=seq(2000,2012,1),labels=seq(2000,2012,1))
+
+
+tryplot                     
+                     
+?ggplot
+
+ggplot(mtcars, aes(hp, mpg)) + geom_point()
+
+ggplot2::ggplot(aes(x = year, y = Incidence), data = Merged, xlim=c(2000,2012), ylim=c(0,5) + geom_point() + theme_bw()+ geom_smooth())
+
+plot_IncTime + geom_point() + geom_smooth()
+
+ggplot2::ggplot(Merged, aes(IncidenceDif, year)) + geom_point() + theme_bw()
+
+ggplot2::ggplot(Merged, aes(year, Incidence)) + geom_point() + theme_bw()+ geom_smooth()
+axis(side=1, at=seq(0,5, 0.5), labels=seq(0,5,0.5))
+axis(side=2, at=seq(0,800,100), labels=seq(0,800,100))
+
+ggplot(aes(data=Merged, x = year, y = Incidence) + geom_point() + theme_bw() + geom_smooth())
+
+# Look at incidence over time - seee the general trend
+IncTime <- ggplot(aes(x = year, y = Incidence), data = Merged, + geom_point() + theme_bw())
+IncTime + geom_smooth()
+
+
 #plot_IncTime + theme(axis.title.x = element_blank()) + ylab("Weight (Kg)")
 
 #library(scales)   # Need the scales package
