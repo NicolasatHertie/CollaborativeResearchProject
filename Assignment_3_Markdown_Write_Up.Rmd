@@ -93,12 +93,9 @@ axis(side=2, at=seq(0,800,100), labels=seq(0,800,100))
 
 When plotting the incidence rates per country (Figure 2) the countries with high incidence rates can be identified and the ranges of the observations per country are shown.
 
-``` {r  fig.width=5, fig.height=9, warning=FALSE, eval=TRUE, message=FALSE, tidy=TRUE, dev='jpeg', echo=FALSE, fig.show='hold', fig.align='center'}
+``` {r  fig.width=500, fig.height=900, warning=FALSE, eval=TRUE, message=FALSE, tidy=TRUE, dev='jpeg', echo=FALSE, fig.show='hold', fig.align='center'}
 # Look at incidence rate per country
 ggplot2::ggplot(Merged, aes(Incidence, country)) + geom_point() + theme_bw()
-
-opts_chunk$set(comment=NA, fig.width=10, fig.height=10))
-
 ```
 
 
