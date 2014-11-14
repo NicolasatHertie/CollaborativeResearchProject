@@ -325,7 +325,7 @@ bptest(L3)
 coeftest(L3,vcov=hccm(L3))
 
 # Including an interaction term
-L4 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl * lFemSchool + lLifeExpect + lDPT + lMeasles,
+L4 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl + lLifeExpect + lDPT + lMeasles + as.factor(QFemSchool),
           data=Merged, family = 'binomial')
 summary(L4)
 plot(L4)
@@ -334,3 +334,34 @@ plot(L4)
 anova(L3,L4)
 
 anova(L4,test="Chisq")
+
+# Looking at Uganda's average values
+Uganda <- subset(Merged,(country=="Uganda"))
+summary(Uganda)
+summary(Merged)
+
+fitted_L4 <- with(Merged,
+                  data.frame(lGDPpc = 7.003,
+                             lRural = 4.461,
+                             lCO2 = -2.52,
+                             lHCexpend = 2.125,
+                             lLifeExpect = 3.98,
+                             lWater = 4.18,
+                             lSanitation = 3.46,
+                             lDPT = 4.199,
+                             lMeasles = 4.235,
+                             lFemUnempl = 1.2576,
+                             QFemSchool = factor(1:4)))
+fitted_L4
+
+Merged$QFemSchool <- Merged$lFemSchool
+Merged$QFemSchool[Merged$lFemSchool<=4.53] <-1
+Merged$QFemSchool[Merged$lFemSchool>4.53 & Merged$lFemSchool<=4.622] <-2
+Merged$QFemSchool[Merged$lFemSchool>4.622 & Merged$lFemSchool<=4.697] <-3
+Merged$QFemSchool[Merged$lFemSchool>4.697] <-4
+
+
+fitted_L4_final <- predict(L4, newdata = fitted_L4,
+                            type = 'response')
+fitted_L4_final
+
