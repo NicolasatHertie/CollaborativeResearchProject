@@ -1,0 +1,159 @@
+---
+
+
+---
+
+
+####################################################################################
+########################### INFERENTIAL STATISTICS #################################
+####################################################################################
+
+As can be seen from the Scatterplots in the descriptive statistics most of the variables are not normally distributed. Further, the variables all have different scales. Therefore, the independent variables were logged for enabling comparisons in the inferential statistics part.
+
+```{r, echo=FALSE, include=FALSE}
+# Logging the independent variables for better comparability
+Merged$lGDP <- log(Merged$GDP)
+Merged$lGDPpc <- log(Merged$GDPpc)
+Merged$lRural <- log(Merged$Rural)
+Merged$lCO2 <- log(Merged$CO2)
+Merged$lHCexpend <- log(Merged$HCexpend)
+Merged$lWater <- log(Merged$Water)
+Merged$lSanitation <- log(Merged$Sanitation)
+Merged$lUnemploym <- log(Merged$Unemploym)
+Merged$lPrimary <- log(Merged$Primary)
+Merged$lHCexpendpc <- log(Merged$HCexpendpc)
+Merged$lFemUnempl <- log(Merged$FemUnempl)
+Merged$lFemSchool <- log(Merged$FemSchool)
+Merged$lLifeExpect <- log(Merged$LifeExpect)
+Merged$lDPT <- log(Merged$DPT)
+Merged$lMeasles <- log(Merged$Measles)
+```
+
+As the dependent variable is coded as a dummy, being 0 if MDG 6.A was fulfilled and 1 for countries that don't fulfill MDG 6.A logistic regressions are used for the inferential statistics part. As Odds and Odds ratios are difficult to present to an audience that is not only consisting of statistical experts predicted probabilities are calculated following the logistic regressions. The interpretation of the results will only focus on the predicted probabilities.
+
+```{r, echo=FALSE, include=FALSE}
+# Running a general logistic regression using all independent variables
+
+L1 <- glm(DDif ~ lGDP + lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lUnemploym + lPrimary + lHCexpendpc + lFemUnempl + lFemSchool + lLifeExpect + lDPT + lMeasles,
+          data=Merged, family = 'binomial')
+summary(L1)
+
+# Testing for multicollinearity
+vif(L1)
+```
+
+The test for multicollinearity showed that the variables GDP, GDP per capital, Unemployment, Female unemployment, Primary education and female schooling were highly multicollinear. Therefore, half of these variables had to be dropped for the final model.
+
+```{r, echo=FALSE, include=FALSE}
+# Running the regression without multicollinear variables
+L2 <- glm(DDif ~ lGDP + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl + lFemSchool + lLifeExpect + lDPT + lMeasles,
+          data=Merged, family = 'binomial')
+summary(L2)
+
+
+L3 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl + lFemSchool + lLifeExpect + lDPT + lMeasles,
+          data=Merged, family = 'binomial')
+summary(L3)
+
+# Testing for multicollinearity
+vif(L2)
+vif(L3)
+
+
+
+# Looking at confidence intervals
+confint(L3)
+
+# Testing for multicollinearity
+bptest(L3)
+coeftest(L3,vcov=hccm(L3))
+
+# Including an interaction term
+L4 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl * lFemSchool + lLifeExpect + lDPT + lMeasles,
+          data=Merged, family = 'binomial')
+summary(L4)
+plot(L4)
+
+# Using the anova function to evaluate the effect on the deviance of adding the interaction term 
+anova(L3,L4)
+
+anova(L4,test="Chisq")
+
+# Looking at Uganda's average values
+Uganda <- subset(Merged,(country=="Uganda"))
+summary(Uganda)
+summary(Merged)
+
+# Creating a new variable with FemSchool by quintiles
+Merged$QFemSchool <- Merged$lFemSchool
+Merged$QFemSchool[Merged$lFemSchool<=4.53] <-1
+Merged$QFemSchool[Merged$lFemSchool>4.53 & Merged$lFemSchool<=4.622] <-2
+Merged$QFemSchool[Merged$lFemSchool>4.622 & Merged$lFemSchool<=4.697] <-3
+Merged$QFemSchool[Merged$lFemSchool>4.697] <-4
+
+# Regressing the model with the new independent variable without the interaction
+L5 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl + lLifeExpect + lDPT + lMeasles + as.factor(QFemSchool),
+          data=Merged, family = 'binomial')
+summary(L5)
+
+# Regressing the model with the new independent variable with the interaction
+L6 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lLifeExpect + lDPT + lMeasles + + lFemUnempl * as.factor(QFemSchool),
+          data=Merged, family = 'binomial')
+summary(L6)
+
+
+# Regressing the model on FemSchool fixing the other indendent variables at Uganda's mean
+fitted_L4 <- with(Merged,
+                  data.frame(lGDPpc = 7.003,
+                             lRural = 4.461,
+                             lCO2 = -2.52,
+                             lHCexpend = 2.125,
+                             lLifeExpect = 3.98,
+                             lWater = 4.18,
+                             lSanitation = 3.46,
+                             lDPT = 4.199,
+                             lMeasles = 4.235,
+                             lFemUnempl = 1.2576,
+                             QFemSchool = factor(1:4)))
+fitted_L4
+
+# Calculating the predicted probabilities
+fitted_L4_final <- predict(L4, newdata = fitted_L4,
+                            type = 'response')
+fitted_L4_final
+```
+
+Exporting the Predicted Probabilities with Stargazer
+```{r, echo=FALSE, type = 'latex', header = FALSE }
+# Stargazer
+
+labels <- c('(Intercept)', 'lGDPpc', 'lRural', 'lCO2',
+            'lHCexpend', 'lLifeExpect', 'lLifeExpect', 'lWater', 'lSanitation',
+            'lDPT', 'lMeasles', 'lFemUnempl', '1st Quartile FemSchool', '2nd Quartile FemSchool',
+            '3rd Quartile FemSchool', '4th Quartile FemSchool')
+
+# HIER STOP
+stargazer::stargazer(L1, L2, L3, covariate.labels = labels,
+               title = 'Logistic Regression Estimates of Grad School Acceptance',
+               digits = 2, type = 'latex', header = FALSE)
+
+```
+If you want to automatically generate tables from regression model output objects, texreg is a good package to turn to. First estimate your models:
+
+L1 <- glm(admit ~ gre,
+              data = Admission, family = 'binomial')
+
+L2 <- glm(admit ~ gre + gpa,
+              data = Admission, family = 'binomial')
+
+L3 <- glm(admit ~ gre + gpa + as.factor(rank),
+              data = Admission, family = 'binomial')
+Then use the stargazer function to create a results table. For PDFs set type = 'latex'. There are many stylistic modifications you can make with this function.
+??????????????????????????????
+# Create cleaner covariate labels
+labels <- c('(Intercept)', 'GRE Score', 'GPA Score', '2nd Ranked School', '3rd Ranked School',
+            '4th Ranked School')
+
+stargazer::stargazer(L1, L2, L3, covariate.labels = la title = 'Logistic Regression Estimates of Grad Sch digits = 2, type = 'latex', header = FALSE)
+                     
+                     
