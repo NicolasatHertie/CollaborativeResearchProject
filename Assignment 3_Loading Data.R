@@ -294,7 +294,7 @@ Merged$lLifeExpect <- log(Merged$LifeExpect)
 Merged$lDPT <- log(Merged$DPT)
 Merged$lMeasles <- log(Merged$Measles)
 
-# Running the logistic regression
+# Running a general logistic regression using all independent variables
 
 L1 <- glm(DDif ~ lGDP + lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lUnemploym + lPrimary + lHCexpendpc + lFemUnempl + lFemSchool + lLifeExpect + lDPT + lMeasles,
           data=Merged, family = 'binomial')
@@ -325,7 +325,7 @@ bptest(L3)
 coeftest(L3,vcov=hccm(L3))
 
 # Including an interaction term
-L4 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl + lLifeExpect + lDPT + lMeasles + as.factor(QFemSchool),
+L4 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl * lFemSchool + lLifeExpect + lDPT + lMeasles,
           data=Merged, family = 'binomial')
 summary(L4)
 plot(L4)
@@ -340,6 +340,25 @@ Uganda <- subset(Merged,(country=="Uganda"))
 summary(Uganda)
 summary(Merged)
 
+# Creating a new variable with FemSchool by quintiles
+Merged$QFemSchool <- Merged$lFemSchool
+Merged$QFemSchool[Merged$lFemSchool<=4.53] <-1
+Merged$QFemSchool[Merged$lFemSchool>4.53 & Merged$lFemSchool<=4.622] <-2
+Merged$QFemSchool[Merged$lFemSchool>4.622 & Merged$lFemSchool<=4.697] <-3
+Merged$QFemSchool[Merged$lFemSchool>4.697] <-4
+
+# Regressing the model with the new independent variable without the interaction
+L5 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lFemUnempl + lLifeExpect + lDPT + lMeasles + as.factor(QFemSchool),
+          data=Merged, family = 'binomial')
+summary(L5)
+
+# Regressing the model with the new independent variable with the interaction
+L6 <- glm(DDif ~ lGDPpc + lRural + lCO2 + lHCexpend + lWater + lSanitation + lLifeExpect + lDPT + lMeasles + + lFemUnempl * as.factor(QFemSchool),
+          data=Merged, family = 'binomial')
+summary(L6)
+
+
+# Regressing the model on FemSchool fixing the other indendent variables at Uganda's mean
 fitted_L4 <- with(Merged,
                   data.frame(lGDPpc = 7.003,
                              lRural = 4.461,
@@ -354,13 +373,7 @@ fitted_L4 <- with(Merged,
                              QFemSchool = factor(1:4)))
 fitted_L4
 
-Merged$QFemSchool <- Merged$lFemSchool
-Merged$QFemSchool[Merged$lFemSchool<=4.53] <-1
-Merged$QFemSchool[Merged$lFemSchool>4.53 & Merged$lFemSchool<=4.622] <-2
-Merged$QFemSchool[Merged$lFemSchool>4.622 & Merged$lFemSchool<=4.697] <-3
-Merged$QFemSchool[Merged$lFemSchool>4.697] <-4
-
-
+# Calculating the predicted probabilities
 fitted_L4_final <- predict(L4, newdata = fitted_L4,
                             type = 'response')
 fitted_L4_final
