@@ -232,6 +232,11 @@ Merged <- merge(dataset, HIVcountry,
                 by = c('iso2c','year'))
 summary(Merged)
 
+# Looking at the observations lost during the merging process
+datasetR <- datasetR[, c(1:2)]
+HIVcountryR <- HIVcountryR[, c(2:3)]
+
+
 ####################################################################################
 ########################## CLEANING THE MERGED DATABASE ############################
 ####################################################################################
